@@ -55,6 +55,7 @@
         position: relative;
         overflow-y: auto;
         padding: 2rem;
+        transition: opacity 0.5s;
     }
 
     /* Animated gradient heading */
@@ -67,6 +68,8 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         animation: gradientAnim 10s ease infinite;
+        opacity: 1;
+        transition: opacity 0.5s;
     }
 
     @keyframes gradientAnim {
@@ -82,6 +85,12 @@
         gap: 20px;
         width: 100%;
         max-width: 800px;
+        opacity: 0;
+        transition: opacity 0.5s;
+    }
+
+    .about-container.show {
+        opacity: 1;
     }
 
     .about-box {
@@ -133,41 +142,66 @@
     const mainContent = document.getElementById('mainContent');
     const heading = document.getElementById('heading');
 
+    function fadeOut(element, callback) {
+        element.style.opacity = 0;
+        setTimeout(callback, 500);
+    }
+
+    function fadeIn(element) {
+        element.style.opacity = 0;
+        requestAnimationFrame(() => {
+            element.style.transition = 'opacity 0.5s';
+            element.style.opacity = 1;
+        });
+    }
+
     aboutBtn.addEventListener('click', () => {
-        // Clear main content
-        mainContent.innerHTML = '';
-
-        // Create About container
-        const container = document.createElement('div');
-        container.className = 'about-container';
-
-        // 5 paragraphs about Cozy Loft Cafe in Roblox
-        const paragraphs = [
-            "Cozy Loft Cafe in Roblox is a virtual space where players can gather, relax, and enjoy a warm, inviting atmosphere. It features modern loft aesthetics with comfy seating and stylish décor.",
-            "The cafe offers interactive elements, such as ordering drinks and snacks, making it a fully immersive experience for Roblox players.",
-            "Players can customize their own tables and spaces, allowing for personal touches that make each visit unique and memorable.",
-            "Regular events are held at Cozy Loft Cafe, including music nights, community hangouts, and special themed activities that bring players together.",
-            "The goal of Cozy Loft Cafe is to create a friendly, welcoming environment where players can socialize, explore, and enjoy the creativity of the Roblox platform."
-        ];
-
-        paragraphs.forEach(text => {
-            const box = document.createElement('div');
-            box.className = 'about-box';
-            box.textContent = text;
-            container.appendChild(box);
-        });
-
-        // Back button
-        const backBtn = document.createElement('button');
-        backBtn.className = 'back-btn';
-        backBtn.textContent = 'Back';
-        backBtn.addEventListener('click', () => {
+        fadeOut(mainContent, () => {
             mainContent.innerHTML = '';
-            mainContent.appendChild(heading);
-        });
 
-        container.appendChild(backBtn);
-        mainContent.appendChild(container);
+            const newHeading = document.createElement('h1');
+            newHeading.className = 'heading';
+            newHeading.textContent = 'About Cozy Loft Cafe Roblox';
+            mainContent.appendChild(newHeading);
+
+            const container = document.createElement('div');
+            container.className = 'about-container';
+
+            const paragraphs = [
+                "Cozy Loft Cafe in Roblox is a virtual space where players can gather, relax, and enjoy a warm, inviting atmosphere. It features modern loft aesthetics with comfy seating and stylish décor.",
+                "The cafe offers interactive elements, such as ordering drinks and snacks, making it a fully immersive experience for Roblox players.",
+                "Players can customize their own tables and spaces, allowing for personal touches that make each visit unique and memorable.",
+                "Regular events are held at Cozy Loft Cafe, including music nights, community hangouts, and special themed activities that bring players together.",
+                "The goal of Cozy Loft Cafe is to create a friendly, welcoming environment where players can socialize, explore, and enjoy the creativity of the Roblox platform."
+            ];
+
+            paragraphs.forEach(text => {
+                const box = document.createElement('div');
+                box.className = 'about-box';
+                box.textContent = text;
+                container.appendChild(box);
+            });
+
+            const backBtn = document.createElement('button');
+            backBtn.className = 'back-btn';
+            backBtn.textContent = 'Back';
+            backBtn.addEventListener('click', () => {
+                fadeOut(mainContent, () => {
+                    mainContent.innerHTML = '';
+                    mainContent.appendChild(heading);
+                    fadeIn(mainContent);
+                });
+            });
+
+            container.appendChild(backBtn);
+            mainContent.appendChild(container);
+
+            requestAnimationFrame(() => {
+                container.classList.add('show');
+            });
+
+            fadeIn(mainContent);
+        });
     });
 </script>
 </body>

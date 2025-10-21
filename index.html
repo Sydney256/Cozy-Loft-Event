@@ -16,61 +16,65 @@
     body, html {
       height: 100%;
       overflow: hidden;
-    }
-
-    /* Background */
-    body {
-      background: linear-gradient(135deg, #fdf6f0, #eaeaea);
+      background: url('https://images.unsplash.com/photo-1556911073-52527ac43727?auto=format&fit=crop&w=1470&q=80') no-repeat center center/cover;
       display: flex;
-      color: #333;
+      color: #fff;
     }
 
-    /* Sidebar */
+    /* Glassmorphism Sidebar */
     .sidebar {
       width: 220px;
-      background: #1c1c1c;
-      color: white;
+      background: rgba(28,28,28,0.4);
+      backdrop-filter: blur(15px);
+      border-right: 1px solid rgba(255,255,255,0.1);
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      align-items: center;
       padding: 30px 10px;
       gap: 20px;
-    }
-
-    .sidebar h1 {
-      font-size: 22px;
-      text-align: center;
-      margin-bottom: 40px;
-      font-weight: 700;
-      color: #ff8c42;
-    }
-
-    .sidebar button {
-      background: transparent;
-      border: none;
-      color: white;
-      padding: 12px 15px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 16px;
       transition: all 0.3s ease;
     }
 
+    .sidebar h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #ffb347;
+      margin-bottom: 40px;
+      text-align: center;
+      letter-spacing: 1px;
+      text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+    }
+
+    .sidebar button {
+      width: 90%;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 15px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: all 0.4s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
     .sidebar button:hover {
-      background: #ff8c42;
-      color: white;
-      transform: translateX(5px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      background: #ffb347;
+      color: #1c1c1c;
+      transform: translateX(10px) scale(1.05);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
     }
 
     /* Main Content */
     .main-content {
       flex: 1;
+      position: relative;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: url('https://images.unsplash.com/photo-1556911073-52527ac43727?auto=format&fit=crop&w=1470&q=80') no-repeat center center/cover;
-      position: relative;
+      overflow: hidden;
     }
 
     .overlay {
@@ -78,17 +82,30 @@
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.35);
       display: flex;
       justify-content: center;
       align-items: center;
+      transition: all 0.5s ease;
     }
 
     .main-content h1 {
-      font-size: 60px;
-      color: white;
-      text-shadow: 2px 2px 15px rgba(0,0,0,0.5);
+      font-size: 64px;
       text-align: center;
+      color: #fff;
+      text-shadow: 2px 2px 20px rgba(0,0,0,0.6);
+      letter-spacing: 2px;
+      animation: fadeIn 2s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* Button click smooth effect */
+    button:active {
+      transform: scale(0.98);
     }
 
     /* Responsive */
@@ -102,6 +119,8 @@
         flex-direction: row;
         justify-content: space-around;
         padding: 15px 0;
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
       }
 
       .sidebar h1 {

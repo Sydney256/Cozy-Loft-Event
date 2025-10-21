@@ -1,212 +1,377 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Cozy Loft Cafe</title>
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Helvetica Neue', sans-serif;
-    }
+  * { box-sizing: border-box; margin:0; padding:0; font-family: 'Helvetica Neue', sans-serif; }
+  body { display:flex; height:100vh; background:#fdf0f5; overflow:hidden; }
 
-    body {
-        display: flex;
-        height: 100vh;
-        background: #fdf0f5;
-        overflow: hidden;
-    }
+  /* Sidebar */
+  .sidebar {
+    width:220px;
+    background:#fff;
+    box-shadow:2px 0 14px rgba(0,0,0,0.08);
+    display:flex;
+    flex-direction:column;
+    padding:28px 16px;
+    gap:8px;
+  }
+  .sidebar button {
+    background:none;
+    border:none;
+    padding:12px 10px;
+    font-size:15px;
+    text-align:left;
+    cursor:pointer;
+    border-radius:10px;
+    transition:all .22s;
+  }
+  .sidebar button:hover { background:#ffb6b9; color:#fff; transform:translateX(4px); }
 
-    /* Sidebar */
-    .sidebar {
-        width: 200px;
-        background-color: #fff;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        display: flex;
-        flex-direction: column;
-        padding: 2rem 1rem;
-    }
+  /* Main content */
+  .main-content {
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:4rem 3rem;
+    overflow-y:auto;
+    transition:opacity .45s;
+  }
 
-    .sidebar button {
-        background: none;
-        border: none;
-        padding: 15px 10px;
-        margin: 5px 0;
-        text-align: left;
-        font-size: 16px;
-        cursor: pointer;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-    }
+  /* Heading with animated gradient */
+  .heading {
+    font-size:56px;
+    font-weight:800;
+    text-align:center;
+    background: linear-gradient(270deg, #ffc0cb, #ff69b4, #ff8c42, #ffd580);
+    background-size: 800% 800%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:gradientAnim 10s ease infinite;
+    transition:opacity .45s;
+  }
+  @keyframes gradientAnim {
+    0%{ background-position:0% 50% } 50%{ background-position:100% 50% } 100%{ background-position:0% 50% }
+  }
 
-    .sidebar button:hover {
-        background: #ffb6b9;
-        color: #fff;
-    }
+  /* About / generic container */
+  .about-container, .moderators-container {
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    width:100%;
+    max-width:900px;
+    opacity:0;
+    transition:opacity .45s, transform .35s;
+    transform: translateY(8px);
+    margin-top:20px;
+  }
+  .about-container.show, .moderators-container.show { opacity:1; transform:translateY(0); }
 
-    /* Main content */
-    .main-content {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        position: relative;
-        overflow-y: auto;
-        padding: 4rem 2rem;
-        transition: opacity 0.5s;
-    }
+  .about-box {
+    background:#fff;
+    padding:22px;
+    border-radius:14px;
+    box-shadow:0 6px 22px rgba(0,0,0,0.08);
+    font-size:17px;
+    line-height:1.6;
+  }
 
-    /* Animated gradient heading */
-    .heading {
-        font-size: 64px;
-        font-weight: bold;
-        text-align: center;
-        background: linear-gradient(270deg, #ffc0cb, #ff69b4, #ff8c42, #ffd580);
-        background-size: 800% 800%;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: gradientAnim 10s ease infinite;
-        opacity: 1;
-        transition: opacity 0.5s;
-    }
+  .back-btn {
+    margin-top:10px;
+    align-self:center;
+    padding:10px 26px;
+    border:none;
+    border-radius:10px;
+    background:#ff8c42;
+    color:#fff;
+    font-size:15px;
+    cursor:pointer;
+    transition:background .22s, transform .12s;
+  }
+  .back-btn:hover { background:#ff69b4; transform:translateY(-2px); }
 
-    @keyframes gradientAnim {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
+  /* Password modal overlay */
+  .overlay {
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,0.45);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s;
+  }
+  .overlay.show { opacity:1; pointer-events:auto; }
 
-    /* About Us boxes */
-    .about-container {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        width: 100%;
-        max-width: 800px;
-        opacity: 0;
-        transition: opacity 0.5s;
-        margin-top: 20px;
-    }
+  .modal {
+    background:#fff;
+    padding:22px;
+    width:360px;
+    border-radius:12px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.25);
+    transform:translateY(8px);
+    transition:transform .22s;
+  }
+  .overlay.show .modal { transform:translateY(0); }
 
-    .about-container.show {
-        opacity: 1;
-    }
+  .modal h3 { font-size:18px; margin-bottom:8px; }
+  .modal p { font-size:14px; color:#555; margin-bottom:12px; }
 
-    .about-box {
-        background: #fff;
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        font-size: 18px;
-        line-height: 1.6;
-        transition: transform 0.3s;
-    }
+  .input-row { display:flex; gap:8px; }
+  .input-row input {
+    flex:1;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid #e6e6e6;
+    font-size:15px;
+  }
+  .input-row button {
+    padding:10px 14px;
+    border-radius:8px;
+    border:none;
+    background:#ff8c42;
+    color:#fff;
+    cursor:pointer;
+    font-weight:600;
+  }
+  .input-row button:hover { background:#ff69b4; }
 
-    .about-box:hover {
-        transform: translateY(-5px);
-    }
+  .error {
+    color:#ff3b30;
+    font-size:13px;
+    margin-top:10px;
+    min-height:18px;
+    opacity:0;
+    transform:translateY(-4px);
+    transition:opacity .18s, transform .18s;
+  }
+  .error.show { opacity:1; transform:translateY(0); }
 
-    .back-btn {
-        margin-top: 20px;
-        align-self: center;
-        padding: 12px 30px;
-        border: none;
-        border-radius: 10px;
-        background: #ff8c42;
-        color: #fff;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background 0.3s;
-    }
-
-    .back-btn:hover {
-        background: #ff69b4;
-    }
-
+  /* small screens */
+  @media (max-width:800px) {
+    .sidebar { width:72px; padding:18px 8px; gap:6px; }
+    .sidebar button { font-size:12px; padding:10px 6px; text-align:center; }
+    .main-content { padding:2.5rem 1rem; }
+    .heading { font-size:36px; }
+    .modal { width:92%; max-width:420px; }
+  }
 </style>
 </head>
 <body>
-    <div class="sidebar">
-        <button id="aboutBtn">About us</button>
-        <button>Meet the Team</button>
-        <button>Issues</button>
-        <button>Partners</button>
-        <button>Moderators</button>
-        <button>Administrators</button>
-    </div>
+  <div class="sidebar">
+    <button id="aboutBtn">About us</button>
+    <button id="teamBtn">Meet the Team</button>
+    <button id="issuesBtn">Issues</button>
+    <button id="partnersBtn">Partners</button>
+    <button id="moderatorsBtn">Moderators</button>
+    <button id="adminsBtn">Administrators</button>
+  </div>
 
-    <div class="main-content" id="mainContent">
-        <h1 class="heading" id="heading">Cozy Loft Cafe</h1>
+  <main class="main-content" id="mainContent">
+    <h1 class="heading" id="heading">Cozy Loft Cafe</h1>
+  </main>
+
+  <!-- Password modal -->
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h3 id="modalTitle">Moderators Access</h3>
+      <p>Enter the password to access the moderators panel.</p>
+
+      <div class="input-row">
+        <input id="pwInput" type="password" placeholder="Password" autocomplete="off" />
+        <button id="pwSubmit">Unlock</button>
+      </div>
+
+      <div class="error" id="pwError"></div>
+
+      <div style="display:flex; gap:8px; margin-top:12px; justify-content:flex-end;">
+        <button id="pwCancel" style="background:#eee; color:#333; padding:8px 12px; border-radius:8px; border:none; cursor:pointer;">Cancel</button>
+      </div>
     </div>
+  </div>
 
 <script>
-    const aboutBtn = document.getElementById('aboutBtn');
-    const mainContent = document.getElementById('mainContent');
-    const heading = document.getElementById('heading');
+  // Elements
+  const mainContent = document.getElementById('mainContent');
+  const heading = document.getElementById('heading');
 
-    function fadeOut(element, callback) {
-        element.style.opacity = 0;
-        setTimeout(callback, 500);
-    }
+  const aboutBtn = document.getElementById('aboutBtn');
+  const moderatorsBtn = document.getElementById('moderatorsBtn');
 
-    function fadeIn(element) {
-        element.style.opacity = 0;
-        requestAnimationFrame(() => {
-            element.style.transition = 'opacity 0.5s';
-            element.style.opacity = 1;
-        });
-    }
+  const overlay = document.getElementById('overlay');
+  const pwInput = document.getElementById('pwInput');
+  const pwSubmit = document.getElementById('pwSubmit');
+  const pwCancel = document.getElementById('pwCancel');
+  const pwError = document.getElementById('pwError');
 
-    aboutBtn.addEventListener('click', () => {
+  // Utility fades
+  function fadeOut(el, cb) {
+    el.style.opacity = 0;
+    setTimeout(() => cb && cb(), 450);
+  }
+  function fadeIn(el) {
+    el.style.opacity = 0;
+    requestAnimationFrame(() => { el.style.transition = 'opacity .45s'; el.style.opacity = 1; });
+  }
+
+  // ABOUT button behavior (keeps prior behavior)
+  aboutBtn.addEventListener('click', () => {
+    fadeOut(mainContent, () => {
+      mainContent.innerHTML = '';
+      const newHeading = document.createElement('h1');
+      newHeading.className = 'heading';
+      newHeading.textContent = 'About Cozy Loft Cafe Roblox';
+      mainContent.appendChild(newHeading);
+
+      const container = document.createElement('div');
+      container.className = 'about-container';
+
+      const paragraphs = [
+        "Cozy Loft Cafe in Roblox is a virtual space where players can gather, relax, and enjoy a warm, inviting atmosphere. It features modern loft aesthetics with comfy seating and stylish décor.",
+        "The cafe offers interactive elements, such as ordering drinks and snacks, making it a fully immersive experience for Roblox players.",
+        "Players can customize their own tables and spaces, allowing for personal touches that make each visit unique and memorable.",
+        "Regular events are held at Cozy Loft Cafe, including music nights, community hangouts, and special themed activities that bring players together.",
+        "The goal of Cozy Loft Cafe is to create a friendly, welcoming environment where players can socialize, explore, and enjoy the creativity of the Roblox platform."
+      ];
+
+      paragraphs.forEach(text => {
+        const box = document.createElement('div');
+        box.className = 'about-box';
+        box.textContent = text;
+        container.appendChild(box);
+      });
+
+      const backBtn = document.createElement('button');
+      backBtn.className = 'back-btn';
+      backBtn.textContent = 'Back';
+      backBtn.addEventListener('click', () => {
         fadeOut(mainContent, () => {
-            mainContent.innerHTML = '';
-
-            const newHeading = document.createElement('h1');
-            newHeading.className = 'heading';
-            newHeading.textContent = 'About Cozy Loft Cafe Roblox';
-            mainContent.appendChild(newHeading);
-
-            const container = document.createElement('div');
-            container.className = 'about-container';
-
-            const paragraphs = [
-                "Cozy Loft Cafe in Roblox is a virtual space where players can gather, relax, and enjoy a warm, inviting atmosphere. It features modern loft aesthetics with comfy seating and stylish décor.",
-                "The cafe offers interactive elements, such as ordering drinks and snacks, making it a fully immersive experience for Roblox players.",
-                "Players can customize their own tables and spaces, allowing for personal touches that make each visit unique and memorable.",
-                "Regular events are held at Cozy Loft Cafe, including music nights, community hangouts, and special themed activities that bring players together.",
-                "The goal of Cozy Loft Cafe is to create a friendly, welcoming environment where players can socialize, explore, and enjoy the creativity of the Roblox platform."
-            ];
-
-            paragraphs.forEach(text => {
-                const box = document.createElement('div');
-                box.className = 'about-box';
-                box.textContent = text;
-                container.appendChild(box);
-            });
-
-            const backBtn = document.createElement('button');
-            backBtn.className = 'back-btn';
-            backBtn.textContent = 'Back';
-            backBtn.addEventListener('click', () => {
-                fadeOut(mainContent, () => {
-                    mainContent.innerHTML = '';
-                    mainContent.appendChild(heading);
-                    fadeIn(mainContent);
-                });
-            });
-
-            container.appendChild(backBtn);
-            mainContent.appendChild(container);
-
-            requestAnimationFrame(() => {
-                container.classList.add('show');
-            });
-
-            fadeIn(mainContent);
+          mainContent.innerHTML = '';
+          mainContent.appendChild(heading);
+          fadeIn(mainContent);
         });
+      });
+
+      container.appendChild(backBtn);
+      mainContent.appendChild(container);
+
+      // show container
+      requestAnimationFrame(() => container.classList.add('show'));
+      fadeIn(mainContent);
     });
+  });
+
+  // Moderators: open password modal
+  moderatorsBtn.addEventListener('click', () => {
+    pwInput.value = '';
+    pwError.textContent = '';
+    pwError.classList.remove('show');
+    overlay.classList.add('show');
+    pwInput.focus();
+  });
+
+  // Cancel modal
+  pwCancel.addEventListener('click', closeModal);
+  // Allow Esc to close
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('show')) closeModal();
+  });
+
+  // Submit password
+  pwSubmit.addEventListener('click', tryPassword);
+  pwInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') tryPassword();
+  });
+
+  function closeModal() {
+    overlay.classList.remove('show');
+  }
+
+  function tryPassword() {
+    const val = pwInput.value || '';
+    // required password
+    if (val === '123456') {
+      // Success: close modal and show moderators UI
+      closeModal();
+      showModeratorsUI();
+    } else {
+      // show error with small shake
+      pwError.textContent = 'Incorrect password. Please try again.';
+      pwError.classList.add('show');
+      pwInput.classList.add('shake');
+      // remove shake after short time
+      setTimeout(() => pwInput.classList.remove('shake'), 400);
+    }
+  }
+
+  // Add shake style dynamically (keeps CSS small)
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes shakeX { 0%{transform:translateX(0)}25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}100%{transform:translateX(0)} }
+    input.shake { animation: shakeX .35s ease; border-color: #ff3b30; }
+  `;
+  document.head.appendChild(style);
+
+  function showModeratorsUI() {
+    fadeOut(mainContent, () => {
+      mainContent.innerHTML = '';
+
+      const newHeading = document.createElement('h1');
+      newHeading.className = 'heading';
+      newHeading.textContent = 'Moderators Panel';
+      mainContent.appendChild(newHeading);
+
+      const container = document.createElement('div');
+      container.className = 'moderators-container';
+
+      // Example moderator entries (you can replace with real data)
+      const mods = [
+        { name: 'Avery', role: 'Lead Moderator', note: 'Focus on community events and behavior.' },
+        { name: 'Kai', role: 'Moderator', note: 'Handles in-game infractions and reports.' },
+        { name: 'Rhea', role: 'Moderator', note: 'Coordinates events & moderates voice chat.' }
+      ];
+
+      mods.forEach(m => {
+        const box = document.createElement('div');
+        box.className = 'about-box';
+        box.innerHTML = `<strong>${escapeHtml(m.name)}</strong> — ${escapeHtml(m.role)}<div style="margin-top:8px;color:#555">${escapeHtml(m.note)}</div>`;
+        container.appendChild(box);
+      });
+
+      // You can add moderator controls here — currently it's informational
+      const backBtn = document.createElement('button');
+      backBtn.className = 'back-btn';
+      backBtn.textContent = 'Back';
+      backBtn.addEventListener('click', () => {
+        fadeOut(mainContent, () => {
+          mainContent.innerHTML = '';
+          mainContent.appendChild(heading);
+          fadeIn(mainContent);
+        });
+      });
+
+      container.appendChild(backBtn);
+      mainContent.appendChild(container);
+
+      requestAnimationFrame(() => container.classList.add('show'));
+      fadeIn(mainContent);
+    });
+  }
+
+  // small helper to avoid HTML injection if you paste content
+  function escapeHtml(s) {
+    return String(s)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'",'&#039;');
+  }
 </script>
 </body>
 </html>

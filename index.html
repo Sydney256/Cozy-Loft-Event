@@ -1,151 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cozy Loft Cafe</title>
-  <style>
-    /* Reset */
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cozy Loft Cafe</title>
+<style>
+    /* Reset and basic styles */
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Helvetica Neue', sans-serif;
     }
 
-    body, html {
-      height: 100%;
-      overflow: hidden;
-      background: url('https://images.unsplash.com/photo-1556911073-52527ac43727?auto=format&fit=crop&w=1470&q=80') no-repeat center center/cover;
-      display: flex;
-      color: #fff;
+    body {
+        display: flex;
+        height: 100vh;
+        background: #fdf0f5;
+        overflow: hidden;
     }
 
-    /* Glassmorphism Sidebar */
+    /* Sidebar */
     .sidebar {
-      width: 220px;
-      background: rgba(28,28,28,0.4);
-      backdrop-filter: blur(15px);
-      border-right: 1px solid rgba(255,255,255,0.1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 30px 10px;
-      gap: 20px;
-      transition: all 0.3s ease;
-    }
-
-    .sidebar h1 {
-      font-size: 24px;
-      font-weight: 800;
-      color: #ffb347;
-      margin-bottom: 40px;
-      text-align: center;
-      letter-spacing: 1px;
-      text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+        width: 200px;
+        background-color: #fff;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        padding: 2rem 1rem;
     }
 
     .sidebar button {
-      width: 90%;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 15px;
-      font-size: 16px;
-      font-weight: 600;
-      color: #fff;
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-      cursor: pointer;
-      transition: all 0.4s ease;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        background: none;
+        border: none;
+        padding: 15px 10px;
+        margin: 5px 0;
+        text-align: left;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.3s ease;
     }
 
     .sidebar button:hover {
-      background: #ffb347;
-      color: #1c1c1c;
-      transform: translateX(10px) scale(1.05);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        background: #ffb6b9;
+        color: #fff;
     }
 
-    /* Main Content */
+    /* Main content */
     .main-content {
-      flex: 1;
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
     }
 
-    .overlay {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.35);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: all 0.5s ease;
+    /* Animated gradient heading */
+    .heading {
+        font-size: 64px;
+        font-weight: bold;
+        text-align: center;
+        background: linear-gradient(270deg, #ffc0cb, #ff69b4, #ff8c42, #ffd580);
+        background-size: 800% 800%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradientAnim 10s ease infinite;
     }
 
-    .main-content h1 {
-      font-size: 64px;
-      text-align: center;
-      color: #fff;
-      text-shadow: 2px 2px 20px rgba(0,0,0,0.6);
-      letter-spacing: 2px;
-      animation: fadeIn 2s ease forwards;
-      opacity: 0;
+    @keyframes gradientAnim {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
 
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
-
-    /* Button click smooth effect */
-    button:active {
-      transform: scale(0.98);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-
-      .sidebar {
-        width: 100%;
-        flex-direction: row;
-        justify-content: space-around;
-        padding: 15px 0;
-        border-right: none;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-      }
-
-      .sidebar h1 {
-        display: none;
-      }
-
-      .main-content h1 {
-        font-size: 40px;
-        padding: 0 20px;
-      }
-    }
-  </style>
+</style>
 </head>
 <body>
-  <div class="sidebar">
-    <h1>Cozy Loft Cafe</h1>
-    <button onclick="alert('About Us')">About Us</button>
-    <button onclick="alert('Meet the Team')">Meet the Team</button>
-    <button onclick="alert('Issues')">Issues</button>
-    <button onclick="alert('Partners')">Partners</button>
-  </div>
-  <div class="main-content">
-    <div class="overlay">
-      <h1>Welcome to Cozy Loft Cafe</h1>
+    <div class="sidebar">
+        <button>About us</button>
+        <button>Meet the Team</button>
+        <button>Issues</button>
+        <button>Partners</button>
     </div>
-  </div>
+    <div class="main-content">
+        <h1 class="heading">Cozy Loft Cafe</h1>
+    </div>
 </body>
 </html>

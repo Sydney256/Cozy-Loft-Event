@@ -54,10 +54,8 @@
         align-items: flex-start;
         position: relative;
         overflow-y: auto;
-        padding: 4rem 2rem; /* Increased top/bottom padding */
-        scroll-behavior: smooth;
+        padding: 4rem 2rem;
         transition: opacity 0.5s;
-        height: 100vh;
     }
 
     /* Animated gradient heading */
@@ -72,7 +70,6 @@
         animation: gradientAnim 10s ease infinite;
         opacity: 1;
         transition: opacity 0.5s;
-        margin-bottom: 2rem;
     }
 
     @keyframes gradientAnim {
@@ -90,6 +87,7 @@
         max-width: 800px;
         opacity: 0;
         transition: opacity 0.5s;
+        margin-top: 20px;
     }
 
     .about-container.show {
@@ -135,7 +133,10 @@
         <button>Meet the Team</button>
         <button>Issues</button>
         <button>Partners</button>
+        <button>Moderators</button>
+        <button>Administrators</button>
     </div>
+
     <div class="main-content" id="mainContent">
         <h1 class="heading" id="heading">Cozy Loft Cafe</h1>
     </div>
@@ -199,7 +200,6 @@
             container.appendChild(backBtn);
             mainContent.appendChild(container);
 
-            // Show with fade-in
             requestAnimationFrame(() => {
                 container.classList.add('show');
             });

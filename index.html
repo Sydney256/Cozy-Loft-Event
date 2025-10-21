@@ -5,373 +5,266 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Cozy Loft Cafe</title>
 <style>
-  * { box-sizing: border-box; margin:0; padding:0; font-family: 'Helvetica Neue', sans-serif; }
-  body { display:flex; height:100vh; background:#fdf0f5; overflow:hidden; }
+* { box-sizing: border-box; margin:0; padding:0; font-family: 'Helvetica Neue', sans-serif; }
+body { display:flex; height:100vh; background:#fdf0f5; overflow:hidden; }
 
-  /* Sidebar */
-  .sidebar {
-    width:220px;
-    background:#fff;
-    box-shadow:2px 0 14px rgba(0,0,0,0.08);
-    display:flex;
-    flex-direction:column;
-    padding:28px 16px;
-    gap:8px;
-  }
-  .sidebar button {
-    background:none;
-    border:none;
-    padding:12px 10px;
-    font-size:15px;
-    text-align:left;
-    cursor:pointer;
-    border-radius:10px;
-    transition:all .22s;
-  }
-  .sidebar button:hover { background:#ffb6b9; color:#fff; transform:translateX(4px); }
+/* Sidebar */
+.sidebar { width:220px; background:#fff; box-shadow:2px 0 14px rgba(0,0,0,0.08); display:flex; flex-direction:column; padding:28px 16px; gap:8px; }
+.sidebar button { background:none; border:none; padding:12px 10px; font-size:15px; text-align:left; cursor:pointer; border-radius:10px; transition:all .22s; }
+.sidebar button:hover { background:#ffb6b9; color:#fff; transform:translateX(4px); }
 
-  /* Main content */
-  .main-content {
-    flex:1;
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    padding:4rem 3rem;
-    overflow-y:auto;
-    transition:opacity .45s;
-  }
+/* Main content */
+.main-content { flex:1; display:flex; justify-content:center; align-items:flex-start; padding:4rem 3rem; overflow-y:auto; transition:opacity .45s; }
 
-  /* Heading with animated gradient */
-  .heading {
-    font-size:56px;
-    font-weight:800;
-    text-align:center;
-    background: linear-gradient(270deg, #ffc0cb, #ff69b4, #ff8c42, #ffd580);
-    background-size: 800% 800%;
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    animation:gradientAnim 10s ease infinite;
-    transition:opacity .45s;
-  }
-  @keyframes gradientAnim {
-    0%{ background-position:0% 50% } 50%{ background-position:100% 50% } 100%{ background-position:0% 50% }
-  }
+/* Heading with animated gradient */
+.heading { font-size:56px; font-weight:800; text-align:center; background: linear-gradient(270deg, #ffc0cb, #ff69b4, #ff8c42, #ffd580); background-size: 800% 800%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:gradientAnim 10s ease infinite; transition:opacity .45s; }
+@keyframes gradientAnim { 0%{ background-position:0% 50% } 50%{ background-position:100% 50% } 100%{ background-position:0% 50% } }
 
-  /* About / generic container */
-  .about-container, .moderators-container {
-    display:flex;
-    flex-direction:column;
-    gap:18px;
-    width:100%;
-    max-width:900px;
-    opacity:0;
-    transition:opacity .45s, transform .35s;
-    transform: translateY(8px);
-    margin-top:20px;
-  }
-  .about-container.show, .moderators-container.show { opacity:1; transform:translateY(0); }
+.about-container, .moderators-container, .logs-container { display:flex; flex-direction:column; gap:18px; width:100%; max-width:900px; opacity:0; transition:opacity .45s, transform .35s; transform: translateY(8px); margin-top:20px; }
+.about-container.show, .moderators-container.show, .logs-container.show { opacity:1; transform:translateY(0); }
 
-  .about-box {
-    background:#fff;
-    padding:22px;
-    border-radius:14px;
-    box-shadow:0 6px 22px rgba(0,0,0,0.08);
-    font-size:17px;
-    line-height:1.6;
-  }
+.about-box, .log-box { background:#fff; padding:22px; border-radius:14px; box-shadow:0 6px 22px rgba(0,0,0,0.08); font-size:17px; line-height:1.6; }
+.back-btn { margin-top:10px; align-self:center; padding:10px 26px; border:none; border-radius:10px; background:#ff8c42; color:#fff; font-size:15px; cursor:pointer; transition:background .22s, transform .12s; }
+.back-btn:hover { background:#ff69b4; transform:translateY(-2px); }
 
-  .back-btn {
-    margin-top:10px;
-    align-self:center;
-    padding:10px 26px;
-    border:none;
-    border-radius:10px;
-    background:#ff8c42;
-    color:#fff;
-    font-size:15px;
-    cursor:pointer;
-    transition:background .22s, transform .12s;
-  }
-  .back-btn:hover { background:#ff69b4; transform:translateY(-2px); }
+/* Moderator action buttons */
+.mod-actions { display:flex; gap:10px; margin-top:14px; }
+.mod-actions button { flex:1; padding:8px 10px; border:none; border-radius:8px; font-size:14px; font-weight:600; color:#fff; cursor:pointer; transition:all 0.25s ease; }
+.warn { background:#ff5252; } .mute { background:#ffb347; } .timeout { background:#007bff; } .rename { background:#6a0dad; }
+.mod-actions button:hover { transform:translateY(-2px); filter:brightness(1.1); }
 
-  /* Password modal overlay */
-  .overlay {
-    position:fixed;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:rgba(0,0,0,0.45);
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .2s;
-  }
-  .overlay.show { opacity:1; pointer-events:auto; }
+/* Overlay modals */
+.overlay { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.45); opacity:0; pointer-events:none; transition:opacity .2s; }
+.overlay.show { opacity:1; pointer-events:auto; }
+.modal { background:#fff; padding:22px; width:360px; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.25); transform:translateY(8px); transition:transform .22s; }
+.overlay.show .modal { transform:translateY(0); }
+.modal h3 { font-size:18px; margin-bottom:8px; } .modal p { font-size:14px; color:#555; margin-bottom:12px; }
+.input-row { display:flex; gap:8px; }
+.input-row input, .input-row select { flex:1; padding:10px 12px; border-radius:8px; border:1px solid #e6e6e6; font-size:15px; }
+.input-row button { padding:10px 14px; border-radius:8px; border:none; background:#ff8c42; color:#fff; cursor:pointer; font-weight:600; }
+.input-row button:hover { background:#ff69b4; }
+.error { color:#ff3b30; font-size:13px; margin-top:10px; min-height:18px; opacity:0; transform:translateY(-4px); transition:opacity .18s, transform .18s; }
+.error.show { opacity:1; transform:translateY(0); }
 
-  .modal {
-    background:#fff;
-    padding:22px;
-    width:360px;
-    border-radius:12px;
-    box-shadow:0 10px 40px rgba(0,0,0,0.25);
-    transform:translateY(8px);
-    transition:transform .22s;
-  }
-  .overlay.show .modal { transform:translateY(0); }
-
-  .modal h3 { font-size:18px; margin-bottom:8px; }
-  .modal p { font-size:14px; color:#555; margin-bottom:12px; }
-
-  .input-row { display:flex; gap:8px; }
-  .input-row input {
-    flex:1;
-    padding:10px 12px;
-    border-radius:8px;
-    border:1px solid #e6e6e6;
-    font-size:15px;
-  }
-  .input-row button {
-    padding:10px 14px;
-    border-radius:8px;
-    border:none;
-    background:#ff8c42;
-    color:#fff;
-    cursor:pointer;
-    font-weight:600;
-  }
-  .input-row button:hover { background:#ff69b4; }
-
-  .error {
-    color:#ff3b30;
-    font-size:13px;
-    margin-top:10px;
-    min-height:18px;
-    opacity:0;
-    transform:translateY(-4px);
-    transition:opacity .18s, transform .18s;
-  }
-  .error.show { opacity:1; transform:translateY(0); }
-
-  /* small screens */
-  @media (max-width:800px) {
-    .sidebar { width:72px; padding:18px 8px; gap:6px; }
-    .sidebar button { font-size:12px; padding:10px 6px; text-align:center; }
-    .main-content { padding:2.5rem 1rem; }
-    .heading { font-size:36px; }
-    .modal { width:92%; max-width:420px; }
-  }
+@media (max-width:800px) { .sidebar { width:72px; padding:18px 8px; gap:6px; } .sidebar button { font-size:12px; padding:10px 6px; text-align:center; } .main-content { padding:2.5rem 1rem; } .heading { font-size:36px; } .modal { width:92%; max-width:420px; } }
 </style>
 </head>
 <body>
-  <div class="sidebar">
-    <button id="aboutBtn">About us</button>
-    <button id="teamBtn">Meet the Team</button>
-    <button id="issuesBtn">Issues</button>
-    <button id="partnersBtn">Partners</button>
-    <button id="moderatorsBtn">Moderators</button>
-    <button id="adminsBtn">Administrators</button>
-  </div>
+<div class="sidebar">
+<button id="aboutBtn">About us</button>
+<button id="teamBtn">Meet the Team</button>
+<button id="issuesBtn">Issues</button>
+<button id="partnersBtn">Partners</button>
+<button id="moderatorsBtn">Moderators</button>
+<button id="adminsBtn">Administrators</button>
+<button id="logsBtn">Logs</button>
+</div>
 
-  <main class="main-content" id="mainContent">
-    <h1 class="heading" id="heading">Cozy Loft Cafe</h1>
-  </main>
+<main class="main-content" id="mainContent">
+<h1 class="heading" id="heading">Cozy Loft Cafe</h1>
+</main>
 
-  <!-- Password modal -->
-  <div class="overlay" id="overlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <h3 id="modalTitle">Moderators Access</h3>
-      <p>Enter the password to access the moderators panel.</p>
+<!-- Password Modal -->
+<div class="overlay" id="pwOverlay">
+<div class="modal">
+<h3>Password Required</h3>
+<p>Enter the password to access this panel.</p>
+<div class="input-row">
+<input id="pwInput" type="password" placeholder="Password" />
+<button id="pwSubmit">Unlock</button>
+</div>
+<div class="error" id="pwError"></div>
+<div style="display:flex; justify-content:flex-end; margin-top:12px;">
+<button id="pwCancel" style="background:#eee; color:#333; padding:8px 12px; border-radius:8px; border:none; cursor:pointer;">Cancel</button>
+</div>
+</div>
+</div>
 
-      <div class="input-row">
-        <input id="pwInput" type="password" placeholder="Password" autocomplete="off" />
-        <button id="pwSubmit">Unlock</button>
-      </div>
+<!-- Rename Modal -->
+<div class="overlay" id="renameOverlay">
+<div class="modal">
+<h3>Rename Moderator</h3>
+<p>Enter the new name:</p>
+<div class="input-row">
+<input id="renameInput" type="text" placeholder="New name..." />
+<button id="renameSubmit">Save</button>
+</div>
+<div style="display:flex; justify-content:flex-end; margin-top:12px;">
+<button id="renameCancel" style="background:#eee; color:#333; padding:8px 12px; border-radius:8px; border:none; cursor:pointer;">Cancel</button>
+</div>
+</div>
+</div>
 
-      <div class="error" id="pwError"></div>
-
-      <div style="display:flex; gap:8px; margin-top:12px; justify-content:flex-end;">
-        <button id="pwCancel" style="background:#eee; color:#333; padding:8px 12px; border-radius:8px; border:none; cursor:pointer;">Cancel</button>
-      </div>
-    </div>
-  </div>
+<!-- Action Modal -->
+<div class="overlay" id="actionOverlay">
+<div class="modal">
+<h3 id="actionTitle">Action</h3>
+<p id="actionDesc">Enter details for this action:</p>
+<div class="input-row">
+<input id="actionReason" type="text" placeholder="Reason..." />
+<select id="actionDuration">
+<option value="">Select duration</option>
+</select>
+</div>
+<div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+<button id="actionConfirm" style="background:#ff8c42;">Confirm</button>
+<button id="actionCancel" style="background:#eee; color:#333;">Cancel</button>
+</div>
+</div>
+</div>
 
 <script>
-  // Elements
-  const mainContent = document.getElementById('mainContent');
-  const heading = document.getElementById('heading');
+const mainContent=document.getElementById('mainContent');
+const heading=document.getElementById('heading');
+const aboutBtn=document.getElementById('aboutBtn');
+const moderatorsBtn=document.getElementById('moderatorsBtn');
+const logsBtn=document.getElementById('logsBtn');
 
-  const aboutBtn = document.getElementById('aboutBtn');
-  const moderatorsBtn = document.getElementById('moderatorsBtn');
+const pwOverlay=document.getElementById('pwOverlay');
+const pwInput=document.getElementById('pwInput');
+const pwSubmit=document.getElementById('pwSubmit');
+const pwCancel=document.getElementById('pwCancel');
+const pwError=document.getElementById('pwError');
 
-  const overlay = document.getElementById('overlay');
-  const pwInput = document.getElementById('pwInput');
-  const pwSubmit = document.getElementById('pwSubmit');
-  const pwCancel = document.getElementById('pwCancel');
-  const pwError = document.getElementById('pwError');
+const renameOverlay=document.getElementById('renameOverlay');
+const renameInput=document.getElementById('renameInput');
+const renameSubmit=document.getElementById('renameSubmit');
+const renameCancel=document.getElementById('renameCancel');
+let currentRenameBox=null;
 
-  // Utility fades
-  function fadeOut(el, cb) {
-    el.style.opacity = 0;
-    setTimeout(() => cb && cb(), 450);
-  }
-  function fadeIn(el) {
-    el.style.opacity = 0;
-    requestAnimationFrame(() => { el.style.transition = 'opacity .45s'; el.style.opacity = 1; });
-  }
+const actionOverlay=document.getElementById('actionOverlay');
+const actionTitle=document.getElementById('actionTitle');
+const actionDesc=document.getElementById('actionDesc');
+const actionReason=document.getElementById('actionReason');
+const actionDuration=document.getElementById('actionDuration');
+const actionConfirm=document.getElementById('actionConfirm');
+const actionCancel=document.getElementById('actionCancel');
+let currentAction=null;
 
-  // ABOUT button behavior (keeps prior behavior)
-  aboutBtn.addEventListener('click', () => {
-    fadeOut(mainContent, () => {
-      mainContent.innerHTML = '';
-      const newHeading = document.createElement('h1');
-      newHeading.className = 'heading';
-      newHeading.textContent = 'About Cozy Loft Cafe Roblox';
-      mainContent.appendChild(newHeading);
+let logs=[]; // Store all actions
 
-      const container = document.createElement('div');
-      container.className = 'about-container';
+function fadeOut(el, cb){ el.style.opacity=0; setTimeout(()=>cb&&cb(),450); }
+function fadeIn(el){ el.style.opacity=0; requestAnimationFrame(()=>{ el.style.transition='opacity .45s'; el.style.opacity=1; }); }
 
-      const paragraphs = [
-        "Cozy Loft Cafe in Roblox is a virtual space where players can gather, relax, and enjoy a warm, inviting atmosphere. It features modern loft aesthetics with comfy seating and stylish décor.",
-        "The cafe offers interactive elements, such as ordering drinks and snacks, making it a fully immersive experience for Roblox players.",
-        "Players can customize their own tables and spaces, allowing for personal touches that make each visit unique and memorable.",
-        "Regular events are held at Cozy Loft Cafe, including music nights, community hangouts, and special themed activities that bring players together.",
-        "The goal of Cozy Loft Cafe is to create a friendly, welcoming environment where players can socialize, explore, and enjoy the creativity of the Roblox platform."
-      ];
+// ABOUT US
+aboutBtn.onclick=()=>{
+fadeOut(mainContent,()=>{
+mainContent.innerHTML='';
+const newHeading=document.createElement('h1'); newHeading.className='heading'; newHeading.textContent='About Cozy Loft Cafe Roblox';
+mainContent.appendChild(newHeading);
+const container=document.createElement('div'); container.className='about-container';
+const paragraphs=[
+"Cozy Loft Cafe in Roblox is a virtual space where players can gather, relax, and enjoy a warm, inviting atmosphere. It features modern loft aesthetics with comfy seating and stylish décor.",
+"The cafe offers interactive elements, such as ordering drinks and snacks, making it a fully immersive experience for Roblox players.",
+"Players can customize their own tables and spaces, allowing for personal touches that make each visit unique and memorable.",
+"Regular events are held at Cozy Loft Cafe, including music nights, community hangouts, and special themed activities that bring players together.",
+"The goal of Cozy Loft Cafe is to create a friendly, welcoming environment where players can socialize, explore, and enjoy the creativity of the Roblox platform."
+];
+paragraphs.forEach(t=>{ const box=document.createElement('div'); box.className='about-box'; box.textContent=t; container.appendChild(box); });
+const backBtn=document.createElement('button'); backBtn.className='back-btn'; backBtn.textContent='Back';
+backBtn.onclick=()=>{ fadeOut(mainContent,()=>{ mainContent.innerHTML=''; mainContent.appendChild(heading); fadeIn(mainContent); }); };
+container.appendChild(backBtn);
+mainContent.appendChild(container); requestAnimationFrame(()=>container.classList.add('show')); fadeIn(mainContent);
+});
+};
 
-      paragraphs.forEach(text => {
-        const box = document.createElement('div');
-        box.className = 'about-box';
-        box.textContent = text;
-        container.appendChild(box);
-      });
+// PASSWORD MODAL
+function openPassword(cb){ pwInput.value=''; pwError.textContent=''; pwError.classList.remove('show'); pwOverlay.classList.add('show'); pwInput.focus(); pwSubmit.onclick=()=>{ if(pwInput.value==='123456'){ pwOverlay.classList.remove('show'); cb(); } else { pwError.textContent='Incorrect password'; pwError.classList.add('show'); } }; }
+pwCancel.onclick=()=>pwOverlay.classList.remove('show');
 
-      const backBtn = document.createElement('button');
-      backBtn.className = 'back-btn';
-      backBtn.textContent = 'Back';
-      backBtn.addEventListener('click', () => {
-        fadeOut(mainContent, () => {
-          mainContent.innerHTML = '';
-          mainContent.appendChild(heading);
-          fadeIn(mainContent);
-        });
-      });
+// RENAME MODAL
+renameCancel.onclick=()=>renameOverlay.classList.remove('show');
+renameSubmit.onclick=()=>{ const newName=renameInput.value.trim(); if(newName&&currentRenameBox){ currentRenameBox.querySelector('strong').textContent=newName; logs.push({action:'Rename', target:newName, moderator:'System', reason:'', duration:'', time:new Date().toLocaleString()}); renameOverlay.classList.remove('show'); } };
 
-      container.appendChild(backBtn);
-      mainContent.appendChild(container);
+// ACTION MODAL
+actionCancel.onclick=()=>actionOverlay.classList.remove('show');
+actionConfirm.onclick=()=>{
+const reason=actionReason.value.trim();
+let duration=actionDuration.value;
+if(duration==='custom'){ duration=customDurationInput.value.trim() || 'N/A'; }
+if(reason===''){ alert('Please enter a reason'); return; }
+logs.push({action:currentAction.action,target:currentAction.name,moderator:'System',reason,duration,time:new Date().toLocaleString()});
+actionOverlay.classList.remove('show');
+alert(`${currentAction.name} ${currentAction.action}d${duration?` for ${duration}`:''} (Reason: ${reason})`);
+};
 
-      // show container
-      requestAnimationFrame(() => container.classList.add('show'));
-      fadeIn(mainContent);
-    });
-  });
+// SHOW MODERATORS UI
+moderatorsBtn.onclick=()=>openPassword(showModeratorsUI);
 
-  // Moderators: open password modal
-  moderatorsBtn.addEventListener('click', () => {
-    pwInput.value = '';
-    pwError.textContent = '';
-    pwError.classList.remove('show');
-    overlay.classList.add('show');
-    pwInput.focus();
-  });
+function showModeratorsUI(){
+fadeOut(mainContent,()=>{
+mainContent.innerHTML='';
+const newHeading=document.createElement('h1'); newHeading.className='heading'; newHeading.textContent='Moderators Panel';
+mainContent.appendChild(newHeading);
 
-  // Cancel modal
-  pwCancel.addEventListener('click', closeModal);
-  // Allow Esc to close
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && overlay.classList.contains('show')) closeModal();
-  });
+const container=document.createElement('div'); container.className='moderators-container';
+const mods=[
+{ name:'Avery', role:'Lead Moderator', note:'Focus on community events and behavior.' },
+{ name:'Kai', role:'Moderator', note:'Handles in-game infractions and reports.' },
+{ name:'Rhea', role:'Moderator', note:'Moderator & event coordinator.' }
+];
 
-  // Submit password
-  pwSubmit.addEventListener('click', tryPassword);
-  pwInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') tryPassword();
-  });
+mods.forEach(m=>{
+const box=document.createElement('div'); box.className='about-box';
+box.innerHTML=`<strong>${m.name}</strong> — ${m.role}<div style="margin-top:8px;color:#555">${m.note}</div>`;
+const actions=document.createElement('div'); actions.className='mod-actions';
 
-  function closeModal() {
-    overlay.classList.remove('show');
-  }
+['Warn','Mute','Timeout','Rename'].forEach(a=>{
+const btn=document.createElement('button'); btn.textContent=a; btn.className=a.toLowerCase();
+if(a==='Rename'){ btn.onclick=()=>{ currentRenameBox=box; renameInput.value=box.querySelector('strong').textContent; renameOverlay.classList.add('show'); renameInput.focus(); }; }
+else { btn.onclick=()=>{
+currentAction={action:a,name:m.name};
+showActionModal(a);
+}; }
+actions.appendChild(btn);
+});
+box.appendChild(actions); container.appendChild(box);
+});
 
-  function tryPassword() {
-    const val = pwInput.value || '';
-    // required password
-    if (val === '123456') {
-      // Success: close modal and show moderators UI
-      closeModal();
-      showModeratorsUI();
-    } else {
-      // show error with small shake
-      pwError.textContent = 'Incorrect password. Please try again.';
-      pwError.classList.add('show');
-      pwInput.classList.add('shake');
-      // remove shake after short time
-      setTimeout(() => pwInput.classList.remove('shake'), 400);
-    }
-  }
+const backBtn=document.createElement('button'); backBtn.className='back-btn'; backBtn.textContent='Back';
+backBtn.onclick=()=>{ fadeOut(mainContent,()=>{ mainContent.innerHTML=''; mainContent.appendChild(heading); fadeIn(mainContent); }); };
+container.appendChild(backBtn);
 
-  // Add shake style dynamically (keeps CSS small)
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes shakeX { 0%{transform:translateX(0)}25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}100%{transform:translateX(0)} }
-    input.shake { animation: shakeX .35s ease; border-color: #ff3b30; }
-  `;
-  document.head.appendChild(style);
+mainContent.appendChild(container); requestAnimationFrame(()=>container.classList.add('show')); fadeIn(mainContent);
+}
 
-  function showModeratorsUI() {
-    fadeOut(mainContent, () => {
-      mainContent.innerHTML = '';
+// SHOW ACTION MODAL
+function showActionModal(action){
+actionOverlay.classList.add('show');
+actionTitle.textContent=`${action} Moderator`;
+actionDesc.textContent=`Enter details for ${action.toLowerCase()}:`;
+actionReason.value='';
+actionDuration.innerHTML='';
+let options=[];
+if(action==='Warn'){ options=['No duration']; }
+if(action==='Mute'){ options=['5m','10m','30m','1h','24h','Custom']; }
+if(action==='Timeout'){ options=['30m','1h','6h','12h','24h','Custom']; }
+options.forEach(o=>{ const opt=document.createElement('option'); opt.value=o.toLowerCase()==='custom'?'custom':o; opt.textContent=o; actionDuration.appendChild(opt); });
+if(actionDuration.querySelector('option[value="custom"]')){ actionDuration.onchange=()=>{ if(actionDuration.value==='custom'){ const input=document.createElement('input'); input.placeholder='Enter custom time'; input.id='customDurationInput'; input.style.flex='1'; input.style.padding='10px'; actionDuration.parentNode.appendChild(input); customDurationInput=input; } else { if(customDurationInput){ customDurationInput.remove(); customDurationInput=null; } } }; } else{ actionDuration.onchange=null; }
+}
 
-      const newHeading = document.createElement('h1');
-      newHeading.className = 'heading';
-      newHeading.textContent = 'Moderators Panel';
-      mainContent.appendChild(newHeading);
+// LOGS UI
+logsBtn.onclick=()=>openPassword(showLogsUI);
+function showLogsUI(){
+fadeOut(mainContent,()=>{
+mainContent.innerHTML='';
+const newHeading=document.createElement('h1'); newHeading.className='heading'; newHeading.textContent='Administrator Logs';
+mainContent.appendChild(newHeading);
 
-      const container = document.createElement('div');
-      container.className = 'moderators-container';
+const container=document.createElement('div'); container.className='logs-container';
+if(logs.length===0){ const box=document.createElement('div'); box.className='log-box'; box.textContent='No logs yet.'; container.appendChild(box); }
+else{ logs.slice().reverse().forEach(l=>{
+const box=document.createElement('div'); box.className='log-box';
+box.textContent=`[${l.time}] ${l.moderator} performed ${l.action} on ${l.target}${l.duration?` for ${l.duration}`:''}${l.reason?` (Reason: ${l.reason})`:''}`;
+container.appendChild(box);
+}); }
 
-      // Example moderator entries (you can replace with real data)
-      const mods = [
-        { name: 'Avery', role: 'Lead Moderator', note: 'Focus on community events and behavior.' },
-        { name: 'Kai', role: 'Moderator', note: 'Handles in-game infractions and reports.' },
-        { name: 'Rhea', role: 'Moderator', note: 'Coordinates events & moderates voice chat.' }
-      ];
+const backBtn=document.createElement('button'); backBtn.className='back-btn'; backBtn.textContent='Back';
+backBtn.onclick=()=>{ fadeOut(mainContent,()=>{ mainContent.innerHTML=''; mainContent.appendChild(heading); fadeIn(mainContent); }); };
+container.appendChild(backBtn);
 
-      mods.forEach(m => {
-        const box = document.createElement('div');
-        box.className = 'about-box';
-        box.innerHTML = `<strong>${escapeHtml(m.name)}</strong> — ${escapeHtml(m.role)}<div style="margin-top:8px;color:#555">${escapeHtml(m.note)}</div>`;
-        container.appendChild(box);
-      });
-
-      // You can add moderator controls here — currently it's informational
-      const backBtn = document.createElement('button');
-      backBtn.className = 'back-btn';
-      backBtn.textContent = 'Back';
-      backBtn.addEventListener('click', () => {
-        fadeOut(mainContent, () => {
-          mainContent.innerHTML = '';
-          mainContent.appendChild(heading);
-          fadeIn(mainContent);
-        });
-      });
-
-      container.appendChild(backBtn);
-      mainContent.appendChild(container);
-
-      requestAnimationFrame(() => container.classList.add('show'));
-      fadeIn(mainContent);
-    });
-  }
-
-  // small helper to avoid HTML injection if you paste content
-  function escapeHtml(s) {
-    return String(s)
-      .replaceAll('&','&amp;')
-      .replaceAll('<','&lt;')
-      .replaceAll('>','&gt;')
-      .replaceAll('"','&quot;')
-      .replaceAll("'",'&#039;');
-  }
+mainContent.appendChild(container); requestAnimationFrame(()=>container.classList.add('show')); fadeIn(mainContent);
+}
 </script>
 </body>
 </html>

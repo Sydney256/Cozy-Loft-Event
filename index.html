@@ -3,34 +3,27 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Cozy Loft Cafe</title>
+<title>Cozy Loft Cafe (Webhook Enabled)</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0;font-family:Inter, 'Helvetica Neue', Arial, sans-serif}
   body{display:flex;height:100vh;background:#fdf0f5;overflow:hidden}
-  /* Sidebar */
   .sidebar{width:220px;background:#fff;box-shadow:2px 0 14px rgba(0,0,0,0.08);display:flex;flex-direction:column;padding:28px 16px;gap:8px}
   .sidebar button{background:none;border:none;padding:12px 10px;font-size:15px;text-align:left;cursor:pointer;border-radius:10px;transition:all .22s}
   .sidebar button:hover{background:#ffb6b9;color:#fff;transform:translateX(4px)}
-  /* Main content */
   .main-content{flex:1;display:flex;justify-content:center;align-items:flex-start;padding:4rem 3rem;overflow-y:auto;transition:opacity .45s}
-  /* Heading gradient */
   .heading{font-size:56px;font-weight:800;text-align:center;background:linear-gradient(270deg,#ffc0cb,#ff69b4,#ff8c42,#ffd580);background-size:800% 800%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradientAnim 10s ease infinite;transition:opacity .45s}
   @keyframes gradientAnim{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-  /* containers */
   .about-container,.moderators-container,.logs-container{display:flex;flex-direction:column;gap:18px;width:100%;max-width:900px;opacity:0;transition:opacity .45s,transform .35s;transform:translateY(8px);margin-top:20px}
   .about-container.show,.moderators-container.show,.logs-container.show{opacity:1;transform:translateY(0)}
   .card{background:#fff;padding:18px;border-radius:12px;box-shadow:0 8px 26px rgba(0,0,0,0.06);font-size:16px;line-height:1.5}
   .back-btn{margin-top:10px;align-self:center;padding:10px 26px;border:none;border-radius:10px;background:#ff8c42;color:#fff;font-size:15px;cursor:pointer;transition:background .22s,transform .12s}
   .back-btn:hover{background:#ff69b4;transform:translateY(-2px)}
-  /* moderator area */
   .mod-actions{display:flex;gap:10px;margin-top:14px}
   .mod-actions button{flex:1;padding:10px;border-radius:8px;border:none;font-weight:700;color:#fff;cursor:pointer;transition:transform .18s,filter .18s}
   .warn{background:#ff5252}.mute{background:#ffb347}.timeout{background:#007bff}.rename{background:#6a0dad}
   .mod-actions button:hover{transform:translateY(-4px);filter:brightness(1.06)}
-  /* small per-moderator (shared) log */
   .mod-log{max-height:180px;overflow:auto;margin-top:12px;padding:10px;background:#fafafa;border-radius:8px;border:1px solid #f0eef2;font-size:14px}
   .log-entry{padding:8px 10px;border-radius:6px;background:#fff;margin-bottom:8px;box-shadow:0 4px 12px rgba(0,0,0,0.03)}
-  /* overlays & modals */
   .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);opacity:0;pointer-events:none;transition:opacity .18s}
   .overlay.show{opacity:1;pointer-events:auto}
   .modal{background:#fff;padding:18px;border-radius:12px;box-shadow:0 14px 60px rgba(0,0,0,0.25);width:360px;max-width:92%;transform:translateY(8px);transition:transform .18s}
@@ -39,11 +32,10 @@
   .input-row{display:flex;gap:8px;align-items:center}
   .input-row input,.input-row select, .input-row textarea{flex:1;padding:10px;border-radius:8px;border:1px solid #e6e6e6;font-size:14px}
   .input-row textarea{resize:vertical;min-height:70px}
-  .modal .row{margin-top:10px}
+  .row{margin-top:10px}
   .small-muted{font-size:13px;color:#666;margin-top:6px}
   .error{color:#ff3b30;font-size:13px;margin-top:8px;min-height:18px;opacity:0;transform:translateY(-4px);transition:opacity .18s,transform .18s}
   .error.show{opacity:1;transform:translateY(0)}
-  /* responsive */
   @media (max-width:800px){.sidebar{width:72px;padding:18px 8px}.sidebar button{font-size:12px;padding:10px 6px;text-align:center}.heading{font-size:36px}.main-content{padding:2.5rem 1rem}}
 </style>
 </head>
@@ -62,7 +54,7 @@
     <h1 class="heading" id="heading">Cozy Loft Cafe</h1>
   </main>
 
-  <!-- Password Modal (reused for all three protected panels) -->
+  <!-- Password Modal -->
   <div class="overlay" id="pwOverlay" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true">
       <h3>Password Required</h3>
@@ -78,7 +70,7 @@
     </div>
   </div>
 
-  <!-- Action Modal (Target, Reason, Duration) -->
+  <!-- Action Modal -->
   <div class="overlay" id="actionOverlay" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true">
       <h3 id="actionTitle">Action</h3>
@@ -117,22 +109,32 @@
   </div>
 
 <script>
-/* Core elements */
+/* -------------------------
+   CONFIG — replace locally
+   -------------------------
+   Replace the placeholder below with your real Discord webhook URL
+   after saving the file locally. Do not share the real URL publicly.
+*/
+const WEBHOOK_URL = 'YOUR_WEBHOOK_URL_HERE'; // <-- replace locally with your webhook
+
+/* -------------------------
+   Constants & elements
+   ------------------------- */
+const PASSWORD = '123456';
 const mainContent = document.getElementById('mainContent');
 const heading = document.getElementById('heading');
+
 const aboutBtn = document.getElementById('aboutBtn');
 const moderatorsBtn = document.getElementById('moderatorsBtn');
 const adminsBtn = document.getElementById('adminsBtn');
 const logsBtn = document.getElementById('logsBtn');
 
-/* Password modal elements */
 const pwOverlay = document.getElementById('pwOverlay');
 const pwInput = document.getElementById('pwInput');
 const pwSubmit = document.getElementById('pwSubmit');
 const pwCancel = document.getElementById('pwCancel');
 const pwError = document.getElementById('pwError');
 
-/* Action modal elements */
 const actionOverlay = document.getElementById('actionOverlay');
 const actionTitle = document.getElementById('actionTitle');
 const actionSubtitle = document.getElementById('actionSubtitle');
@@ -146,18 +148,20 @@ const actionError = document.getElementById('actionError');
 const actionConfirm = document.getElementById('actionConfirm');
 const actionCancel = document.getElementById('actionCancel');
 
-let protectedCallback = null; // callback after correct password
-const PASSWORD = '123456';
-
-/* Logs storage */
+let protectedCallback = null;
+let currentAction = null;
 let globalLogs = []; // all actions (for Admin Logs)
 let moderatorLogEntries = []; // entries shown under the moderator panel (shared)
 
-/* helper fades */
-function fadeOut(el, cb){ el.style.opacity = 0; setTimeout(()=>cb&&cb(),450) }
-function fadeIn(el){ el.style.opacity = 0; requestAnimationFrame(()=>{ el.style.transition = 'opacity .45s'; el.style.opacity = 1 }) }
+/* -------------------------
+   UI helpers
+   ------------------------- */
+function fadeOut(el, cb){ el.style.opacity = 0; setTimeout(()=>cb&&cb(),450); }
+function fadeIn(el){ el.style.opacity = 0; requestAnimationFrame(()=>{ el.style.transition = 'opacity .45s'; el.style.opacity = 1; }); }
 
-/* ABOUT US view */
+/* -------------------------
+   About page
+   ------------------------- */
 aboutBtn.onclick = () => {
   fadeOut(mainContent, () => {
     mainContent.innerHTML = '';
@@ -179,13 +183,16 @@ aboutBtn.onclick = () => {
     const back = document.createElement('button'); back.className = 'back-btn'; back.textContent = 'Back';
     back.onclick = ()=>{ fadeOut(mainContent, ()=>{ mainContent.innerHTML=''; mainContent.appendChild(heading); fadeIn(mainContent); }) };
     container.appendChild(back);
+
     mainContent.appendChild(container);
     requestAnimationFrame(()=>container.classList.add('show'));
     fadeIn(mainContent);
-  })
-}
+  });
+};
 
-/* PASSWORD overlay helper (used for Moderators, Admins, Logs) */
+/* -------------------------
+   Password overlay helper
+   ------------------------- */
 function requestPassword(callback){
   protectedCallback = callback;
   pwInput.value = '';
@@ -207,20 +214,20 @@ pwSubmit.onclick = ()=> {
 };
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ if(pwOverlay.classList.contains('show')) pwOverlay.classList.remove('show'); if(actionOverlay.classList.contains('show')) closeActionModal(); } });
 
-/* MODERATORS panel — password-protected entry */
+/* -------------------------
+   Moderators panel (password protected)
+   ------------------------- */
 moderatorsBtn.onclick = ()=> requestPassword(showModeratorsPanel);
 
-/* Show moderators UI: only buttons and shared moderator log */
 function showModeratorsPanel(){
-  fadeOut(mainContent,()=>{
+  fadeOut(mainContent, () => {
     mainContent.innerHTML = '';
-    const h = document.createElement('h1'); h.className='heading'; h.textContent='Moderators Panel';
+    const h = document.createElement('h1'); h.className = 'heading'; h.textContent = 'Moderators Panel';
     mainContent.appendChild(h);
 
-    const container = document.createElement('div'); container.className='moderators-container';
+    const container = document.createElement('div'); container.className = 'moderators-container';
 
-    // Action buttons area card
-    const actionCard = document.createElement('div'); actionCard.className='card';
+    const actionCard = document.createElement('div'); actionCard.className = 'card';
     const title = document.createElement('div'); title.style.fontWeight='700'; title.textContent = 'Moderator Actions';
     actionCard.appendChild(title);
 
@@ -233,7 +240,6 @@ function showModeratorsPanel(){
     actions.appendChild(warnBtn); actions.appendChild(muteBtn); actions.appendChild(timeoutBtn); actions.appendChild(renameBtn);
     actionCard.appendChild(actions);
 
-    // Shared moderator log area (live-updating)
     const logTitle = document.createElement('div'); logTitle.style.marginTop='12px'; logTitle.style.fontWeight='600'; logTitle.textContent='Moderator Action Log (this panel)';
     actionCard.appendChild(logTitle);
 
@@ -245,7 +251,6 @@ function showModeratorsPanel(){
     }
     actionCard.appendChild(modLog);
 
-    // Back button
     const back = document.createElement('button'); back.className='back-btn'; back.textContent='Back';
     back.onclick = ()=>{ fadeOut(mainContent, ()=>{ mainContent.innerHTML=''; mainContent.appendChild(heading); fadeIn(mainContent); }) };
 
@@ -255,24 +260,19 @@ function showModeratorsPanel(){
     requestAnimationFrame(()=>container.classList.add('show'));
     fadeIn(mainContent);
 
-    // Wire button handlers (open action modal accordingly)
     warnBtn.onclick = ()=> openActionModal('Warn');
     muteBtn.onclick = ()=> openActionModal('Mute');
     timeoutBtn.onclick = ()=> openActionModal('Timeout');
     renameBtn.onclick = ()=> openActionModal('Rename');
-  })
+  });
 }
 
-/* ACTION modal helpers */
-/* Opens the modal for a given action type.
-   For Warn: target + reason
-   For Mute: target + reason + duration (5m,10m,30m,1h,24h + Custom)
-   For Timeout: target + reason + duration (30m,1h,6h,12h,24h + Custom)
-   For Rename: target + new name (uses renameTarget field)
-*/
+/* -------------------------
+   Action modal logic
+   ------------------------- */
 function openActionModal(actionType){
-  currentAction = { action: actionType }; // temp holder
-  actionTitle.textContent = `${actionType}`;
+  currentAction = { action: actionType };
+  actionTitle.textContent = actionType;
   actionSubtitle.textContent = `Fill the fields for ${actionType.toLowerCase()}.`;
   actionTarget.value = '';
   actionReason.value = '';
@@ -283,44 +283,42 @@ function openActionModal(actionType){
   actionDuration.innerHTML = '';
 
   if(actionType === 'Warn'){
-    reasonRowShow(true); durationRow.style.display='none';
-    // Warn: no durations; only reason.
+    reasonRowShow(true);
+    durationRow.style.display = 'none';
   } else if(actionType === 'Mute'){
-    reasonRowShow(true); durationRow.style.display='block';
+    reasonRowShow(true);
+    durationRow.style.display = 'block';
     populateDurationOptions(['5m','10m','30m','1h','24h','Custom']);
   } else if(actionType === 'Timeout'){
-    reasonRowShow(true); durationRow.style.display='block';
+    reasonRowShow(true);
+    durationRow.style.display = 'block';
     populateDurationOptions(['30m','1h','6h','12h','24h','Custom']);
   } else if(actionType === 'Rename'){
-    reasonRowShow(false); durationRow.style.display='none';
+    reasonRowShow(false);
+    durationRow.style.display = 'none';
     renameRow.style.display = 'block';
     renameTarget.value = '';
   }
 
-  // show modal
   actionOverlay.classList.add('show');
   actionTarget.focus();
 }
 
-/* helper to show/hide reason row */
 function reasonRowShow(show){
   document.getElementById('reasonRow').style.display = show ? 'block' : 'none';
 }
 
-/* populate duration select with values and attach custom handling */
 function populateDurationOptions(list){
   actionDuration.innerHTML = '';
   list.forEach(item=>{
     const opt = document.createElement('option');
-    opt.value = item.toLowerCase()==='custom'?'custom':item;
+    opt.value = item.toLowerCase() === 'custom' ? 'custom' : item;
     opt.textContent = item;
     actionDuration.appendChild(opt);
   });
-  // remove existing custom input if any
   if(window._customDurInput){ window._customDurInput.remove(); window._customDurInput = null; }
   actionDuration.onchange = ()=>{
     if(actionDuration.value === 'custom'){
-      // append a small custom input below select
       if(!window._customDurInput){
         const input = document.createElement('input');
         input.placeholder = 'Enter custom duration (e.g. 45m, 2h)';
@@ -340,92 +338,88 @@ function populateDurationOptions(list){
   }
 }
 
-/* Close action modal and cleanup */
 function closeActionModal(){
   actionOverlay.classList.remove('show');
   if(window._customDurInput){ window._customDurInput.remove(); window._customDurInput = null; }
 }
 actionCancel.onclick = closeActionModal;
 
-/* Confirm action */
 actionConfirm.onclick = ()=>{
   const actionType = currentAction.action;
   const target = actionTarget.value.trim();
   if(!target){ actionError.textContent = 'Please enter a target username.'; actionError.classList.add('show'); return; }
-  let reason = actionReason.value.trim();
-  let duration = '';
+
   if(actionType === 'Rename'){
     const newName = renameTarget.value.trim();
     if(!newName){ actionError.textContent = 'Please enter the new name.'; actionError.classList.add('show'); return; }
-    // Log rename: target => newName
-    const entry = {
-      action: 'Rename',
-      target: target,
-      extra: `to "${newName}"`,
-      reason: '',
-      duration: '',
-      time: new Date().toLocaleString()
-    };
+    const entry = { action: 'Rename', target: target, extra: `to "${newName}"`, reason: '', duration: '', time: new Date().toLocaleString() };
     pushLog(entry);
     closeActionModal();
     alert(`Renamed ${target} → ${newName}`);
     return;
   }
 
-  // for Warn/Mute/Timeout
+  // Warn / Mute / Timeout
+  const reason = actionReason.value.trim();
   if(actionType === 'Warn'){
     if(!reason){ actionError.textContent = 'Please enter a reason.'; actionError.classList.add('show'); return; }
-  } else {
-    // Mute/Timeout: duration required (or custom)
-    const sel = actionDuration.value;
-    if(!sel){ actionError.textContent = 'Please select a duration.'; actionError.classList.add('show'); return; }
-    if(sel === 'custom'){
-      if(window._customDurInput && window._customDurInput.value.trim()){
-        duration = window._customDurInput.value.trim();
-      } else {
-        actionError.textContent = 'Please enter a custom duration.'; actionError.classList.add('show'); return;
-      }
-    } else {
-      duration = sel;
-    }
-    if(!reason){ actionError.textContent = 'Please enter a reason.'; actionError.classList.add('show'); return; }
+    const entry = { action: 'Warn', target, extra: '', reason, duration: '', time: new Date().toLocaleString() };
+    pushLog(entry);
+    closeActionModal();
+    alert(`Warned ${target} — Reason: ${reason}`);
+    return;
   }
 
-  // push appropriate entry
-  const entry = {
-    action: actionType,
-    target: target,
-    extra: '',
-    reason: reason,
-    duration: duration,
-    time: new Date().toLocaleString()
-  };
+  // Mute/Timeout require duration + reason
+  const sel = actionDuration.value;
+  if(!sel){ actionError.textContent = 'Please select a duration.'; actionError.classList.add('show'); return; }
+  let duration = '';
+  if(sel === 'custom'){
+    if(window._customDurInput && window._customDurInput.value.trim()){
+      duration = window._customDurInput.value.trim();
+    } else {
+      actionError.textContent = 'Please enter a custom duration.'; actionError.classList.add('show'); return;
+    }
+  } else {
+    duration = sel;
+  }
+  if(!reason){ actionError.textContent = 'Please enter a reason.'; actionError.classList.add('show'); return; }
+
+  const entry = { action: actionType, target, extra: '', reason, duration, time: new Date().toLocaleString() };
   pushLog(entry);
   closeActionModal();
-  alert(`${target} ${actionType} applied${duration?` for ${duration}`:''} — Reason: ${reason}`);
-}
+  alert(`${target} ${actionType} applied for ${duration} — Reason: ${reason}`);
+};
 
-/* push logs to both moderator shared log and global logs and update UI */
+/* -------------------------
+   Logging + webhook sending
+   ------------------------- */
 function pushLog(entry){
-  // create display string for shared moderator log
-  const short = { ...entry }; // copy
-  moderatorLogEntries.push(short);
-  globalLogs.push({ ...entry, moderator: 'Local' }); // 'moderator' placeholder - you can change to real names later
+  // add to shared moderator log
+  moderatorLogEntries.push(entry);
 
-  // update moderator UI if present
+  // add to global logs (include moderator placeholder)
+  globalLogs.push({ ...entry, moderator: 'Local' });
+
+  // update moderator panel live view
   const modLog = document.getElementById('modLog');
   if(modLog){
-    // if it had the empty message, remove it
     if(modLog.children.length === 1 && modLog.children[0].classList.contains('small-muted')) modLog.innerHTML = '';
-    const el = document.createElement('div'); el.className='log-entry'; el.textContent = formatLogEntry(entry);
+    const el = document.createElement('div'); el.className = 'log-entry'; el.textContent = formatLogEntry(entry);
     modLog.appendChild(el);
     modLog.scrollTop = modLog.scrollHeight;
   }
-  // update global logs panel if open
+
+  // update global logs panel if open (live)
   updateGlobalLogsPanelLive();
+
+  // send an embed to the webhook (if configured)
+  sendToWebhookEmbed(entry).catch(err=>{
+    // silently fail but you can inspect in console during development
+    console.warn('Webhook send failed (likely CORS or no webhook URL configured):', err);
+  });
 }
 
-/* format a log object into readable string */
 function formatLogEntry(e){
   if(e.action === 'Rename') return `[${e.time}] Rename ${e.target} ${e.extra||''}`;
   let s = `[${e.time}] ${e.action} ${e.target}`;
@@ -434,11 +428,57 @@ function formatLogEntry(e){
   return s;
 }
 
-/* ADMIN/LOGS panels: password protected */
+/* -------------------------
+   Webhook: sends a Discord embed
+   -------------------------
+   IMPORTANT: Replace WEBHOOK_URL with your real URL locally.
+   Browser -> Discord webhook requests may be blocked by CORS.
+   If you see CORS errors, deploy a tiny proxy/server that forwards the request.
+*/
+async function sendToWebhookEmbed(entry){
+  if(!WEBHOOK_URL || WEBHOOK_URL === 'https://discord.com/api/webhooks/1431017249522581695/UBhF3kMbaleZpY0GBQnQUMmnqTQsMavjUp1kyeepQMlCu_3IXU4guxwbNp-jAg3AEAG4') return Promise.reject(new Error('No webhook URL configured. Replace WEBHOOK_URL constant in the file with your webhook URL locally.'));
+
+  // choose color per action
+  const colors = { Warn: 0xFF5252, Mute: 0xFFB347, Timeout: 0x007BFF, Rename: 0x6A0DAD };
+  const color = colors[entry.action] || 0x999999;
+
+  const embedFields = [
+    { name: 'Action', value: entry.action, inline: true },
+    { name: 'Target', value: entry.target, inline: true },
+  ];
+  if(entry.duration) embedFields.push({ name: 'Duration', value: entry.duration, inline: true });
+  if(entry.reason) embedFields.push({ name: 'Reason', value: entry.reason, inline: false });
+  if(entry.extra) embedFields.push({ name: 'Extra', value: entry.extra, inline: false });
+  embedFields.push({ name: 'Timestamp', value: entry.time, inline: false });
+
+  const payload = {
+    embeds: [{
+      title: `Moderator Action: ${entry.action}`,
+      color: color,
+      fields: embedFields,
+      footer: { text: 'Cozy Loft Cafe Moderation' }
+    }]
+  };
+
+  // send via fetch
+  const resp = await fetch(WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if(!resp.ok) {
+    const txt = await resp.text().catch(()=>null);
+    throw new Error(`Webhook request failed: ${resp.status} ${resp.statusText} ${txt||''}`);
+  }
+  return resp;
+}
+
+/* -------------------------
+   Logs/Admin panels
+   ------------------------- */
 logsBtn.onclick = ()=> requestPassword(showLogsPanel);
 adminsBtn.onclick = ()=> requestPassword(showAdminsPanel);
 
-/* Show Logs Panel */
 function showLogsPanel(){
   fadeOut(mainContent, ()=> {
     mainContent.innerHTML = '';
@@ -449,8 +489,8 @@ function showLogsPanel(){
     const box = document.createElement('div'); box.className='card'; box.style.padding='12px';
     const logsHolder = document.createElement('div'); logsHolder.id = 'globalLogsHolder'; logsHolder.style.maxHeight='420px'; logsHolder.style.overflow='auto';
     box.appendChild(logsHolder);
-
     container.appendChild(box);
+
     const back = document.createElement('button'); back.className='back-btn'; back.textContent='Back';
     back.onclick = ()=>{ fadeOut(mainContent, ()=>{ mainContent.innerHTML=''; mainContent.appendChild(heading); fadeIn(mainContent); }) };
     container.appendChild(back);
@@ -458,12 +498,11 @@ function showLogsPanel(){
     mainContent.appendChild(container);
     requestAnimationFrame(()=>container.classList.add('show'));
     fadeIn(mainContent);
-    // populate logs
+
     updateGlobalLogsUI();
   })
 }
 
-/* Show Administrators Panel (simple placeholder with Back) */
 function showAdminsPanel(){
   fadeOut(mainContent, ()=>{
     mainContent.innerHTML = '';
@@ -481,7 +520,6 @@ function showAdminsPanel(){
   })
 }
 
-/* update global logs UI (when opening Logs panel) */
 function updateGlobalLogsUI(){
   const holder = document.getElementById('globalLogsHolder');
   if(!holder) return;
@@ -490,14 +528,12 @@ function updateGlobalLogsUI(){
     const empty = document.createElement('div'); empty.className='small-muted'; empty.textContent='No logs yet.';
     holder.appendChild(empty);
   } else {
-    // show newest first
     globalLogs.slice().reverse().forEach(l=>{
       const d = document.createElement('div'); d.className='log-entry'; d.textContent = formatGlobalLog(l); holder.appendChild(d);
-    })
+    });
   }
 }
 
-/* format global log */
 function formatGlobalLog(l){
   if(l.action === 'Rename') return `[${l.time}] Rename ${l.target} ${l.extra||''}`;
   let s = `[${l.time}] ${l.action} ${l.target}`;
@@ -506,24 +542,20 @@ function formatGlobalLog(l){
   return s;
 }
 
-/* When logs panel is open, we want live updates. This function will update it if it's visible. */
+/* live update when open */
 function updateGlobalLogsPanelLive(){
-  const holder = document.getElementById('globalLogsHolder');
-  if(!holder) return; // not open
-  // append latest entry
-  const l = globalLogs[globalLogs.length - 1];
-  if(!l) return;
+  const holder = document.getElementById('globalLogsHolder'); if(!holder) return;
+  const l = globalLogs[globalLogs.length - 1]; if(!l) return;
   const d = document.createElement('div'); d.className='log-entry'; d.textContent = formatGlobalLog(l);
   holder.insertBefore(d, holder.firstChild);
 }
 
-/* ensure ESC closes action modal as well */
+/* close action modal with Esc */
 document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape'){ if(actionOverlay.classList.contains('show')) closeActionModal(); } });
 
-/* small initial fade-in */
+/* initial */
 document.addEventListener('DOMContentLoaded', ()=>{ mainContent.style.opacity = 1; });
 
-/* End of script */
 </script>
 </body>
 </html>

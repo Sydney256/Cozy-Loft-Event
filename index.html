@@ -5,263 +5,525 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Cozy Loft Cafe</title>
 <style>
-* { box-sizing: border-box; margin:0; padding:0; font-family: 'Helvetica Neue', sans-serif; }
-body { display:flex; height:100vh; background:#fdf0f5; overflow:hidden; }
-
-/* Sidebar */
-.sidebar { width:220px; background:#fff; box-shadow:2px 0 14px rgba(0,0,0,0.08); display:flex; flex-direction:column; padding:28px 16px; gap:8px; }
-.sidebar button { background:none; border:none; padding:12px 10px; font-size:15px; text-align:left; cursor:pointer; border-radius:10px; transition:all .22s; }
-.sidebar button:hover { background:#ffb6b9; color:#fff; transform:translateX(4px); }
-
-/* Main content */
-.main-content { flex:1; display:flex; justify-content:center; align-items:flex-start; padding:4rem 3rem; overflow-y:auto; transition:opacity .45s; }
-
-/* Heading with animated gradient */
-.heading { font-size:56px; font-weight:800; text-align:center; background: linear-gradient(270deg, #ffc0cb, #ff69b4, #ff8c42, #ffd580); background-size: 800% 800%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:gradientAnim 10s ease infinite; transition:opacity .45s; }
-@keyframes gradientAnim { 0%{ background-position:0% 50% } 50%{ background-position:100% 50% } 100%{ background-position:0% 50% } }
-
-.about-container, .moderators-container, .logs-container { display:flex; flex-direction:column; gap:18px; width:100%; max-width:900px; opacity:0; transition:opacity .45s, transform .35s; transform: translateY(8px); margin-top:20px; }
-.about-container.show, .moderators-container.show, .logs-container.show { opacity:1; transform:translateY(0); }
-
-.about-box, .log-box { background:#fff; padding:22px; border-radius:14px; box-shadow:0 6px 22px rgba(0,0,0,0.08); font-size:17px; line-height:1.6; }
-.back-btn { margin-top:10px; align-self:center; padding:10px 26px; border:none; border-radius:10px; background:#ff8c42; color:#fff; font-size:15px; cursor:pointer; transition:background .22s, transform .12s; }
-.back-btn:hover { background:#ff69b4; transform:translateY(-2px); }
-
-/* Moderator action buttons */
-.mod-actions { display:flex; gap:10px; margin-top:14px; }
-.mod-actions button { flex:1; padding:8px 10px; border:none; border-radius:8px; font-size:14px; font-weight:600; color:#fff; cursor:pointer; transition:all 0.25s ease; }
-.warn { background:#ff5252; } .mute { background:#ffb347; } .timeout { background:#007bff; } .rename { background:#6a0dad; }
-.mod-actions button:hover { transform:translateY(-2px); filter:brightness(1.1); }
-
-/* Overlay modals */
-.overlay { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.45); opacity:0; pointer-events:none; transition:opacity .2s; }
-.overlay.show { opacity:1; pointer-events:auto; }
-.modal { background:#fff; padding:22px; width:360px; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.25); transform:translateY(8px); transition:transform .22s; }
-.overlay.show .modal { transform:translateY(0); }
-.modal h3 { font-size:18px; margin-bottom:8px; } .modal p { font-size:14px; color:#555; margin-bottom:12px; }
-.input-row { display:flex; gap:8px; }
-.input-row input, .input-row select { flex:1; padding:10px 12px; border-radius:8px; border:1px solid #e6e6e6; font-size:15px; }
-.input-row button { padding:10px 14px; border-radius:8px; border:none; background:#ff8c42; color:#fff; cursor:pointer; font-weight:600; }
-.input-row button:hover { background:#ff69b4; }
-.error { color:#ff3b30; font-size:13px; margin-top:10px; min-height:18px; opacity:0; transform:translateY(-4px); transition:opacity .18s, transform .18s; }
-.error.show { opacity:1; transform:translateY(0); }
-
-@media (max-width:800px) { .sidebar { width:72px; padding:18px 8px; gap:6px; } .sidebar button { font-size:12px; padding:10px 6px; text-align:center; } .main-content { padding:2.5rem 1rem; } .heading { font-size:36px; } .modal { width:92%; max-width:420px; } }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:Inter, 'Helvetica Neue', Arial, sans-serif}
+  body{display:flex;height:100vh;background:#fdf0f5;overflow:hidden}
+  /* Sidebar */
+  .sidebar{width:220px;background:#fff;box-shadow:2px 0 14px rgba(0,0,0,0.08);display:flex;flex-direction:column;padding:28px 16px;gap:8px}
+  .sidebar button{background:none;border:none;padding:12px 10px;font-size:15px;text-align:left;cursor:pointer;border-radius:10px;transition:all .22s}
+  .sidebar button:hover{background:#ffb6b9;color:#fff;transform:translateX(4px)}
+  /* Main content */
+  .main-content{flex:1;display:flex;justify-content:center;align-items:flex-start;padding:4rem 3rem;overflow-y:auto;transition:opacity .45s}
+  /* Heading gradient */
+  .heading{font-size:56px;font-weight:800;text-align:center;background:linear-gradient(270deg,#ffc0cb,#ff69b4,#ff8c42,#ffd580);background-size:800% 800%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradientAnim 10s ease infinite;transition:opacity .45s}
+  @keyframes gradientAnim{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  /* containers */
+  .about-container,.moderators-container,.logs-container{display:flex;flex-direction:column;gap:18px;width:100%;max-width:900px;opacity:0;transition:opacity .45s,transform .35s;transform:translateY(8px);margin-top:20px}
+  .about-container.show,.moderators-container.show,.logs-container.show{opacity:1;transform:translateY(0)}
+  .card{background:#fff;padding:18px;border-radius:12px;box-shadow:0 8px 26px rgba(0,0,0,0.06);font-size:16px;line-height:1.5}
+  .back-btn{margin-top:10px;align-self:center;padding:10px 26px;border:none;border-radius:10px;background:#ff8c42;color:#fff;font-size:15px;cursor:pointer;transition:background .22s,transform .12s}
+  .back-btn:hover{background:#ff69b4;transform:translateY(-2px)}
+  /* moderator area */
+  .mod-actions{display:flex;gap:10px;margin-top:14px}
+  .mod-actions button{flex:1;padding:10px;border-radius:8px;border:none;font-weight:700;color:#fff;cursor:pointer;transition:transform .18s,filter .18s}
+  .warn{background:#ff5252}.mute{background:#ffb347}.timeout{background:#007bff}.rename{background:#6a0dad}
+  .mod-actions button:hover{transform:translateY(-4px);filter:brightness(1.06)}
+  /* small per-moderator (shared) log */
+  .mod-log{max-height:180px;overflow:auto;margin-top:12px;padding:10px;background:#fafafa;border-radius:8px;border:1px solid #f0eef2;font-size:14px}
+  .log-entry{padding:8px 10px;border-radius:6px;background:#fff;margin-bottom:8px;box-shadow:0 4px 12px rgba(0,0,0,0.03)}
+  /* overlays & modals */
+  .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);opacity:0;pointer-events:none;transition:opacity .18s}
+  .overlay.show{opacity:1;pointer-events:auto}
+  .modal{background:#fff;padding:18px;border-radius:12px;box-shadow:0 14px 60px rgba(0,0,0,0.25);width:360px;max-width:92%;transform:translateY(8px);transition:transform .18s}
+  .overlay.show .modal{transform:translateY(0)}
+  .modal h3{font-size:18px;margin-bottom:8px}
+  .input-row{display:flex;gap:8px;align-items:center}
+  .input-row input,.input-row select, .input-row textarea{flex:1;padding:10px;border-radius:8px;border:1px solid #e6e6e6;font-size:14px}
+  .input-row textarea{resize:vertical;min-height:70px}
+  .modal .row{margin-top:10px}
+  .small-muted{font-size:13px;color:#666;margin-top:6px}
+  .error{color:#ff3b30;font-size:13px;margin-top:8px;min-height:18px;opacity:0;transform:translateY(-4px);transition:opacity .18s,transform .18s}
+  .error.show{opacity:1;transform:translateY(0)}
+  /* responsive */
+  @media (max-width:800px){.sidebar{width:72px;padding:18px 8px}.sidebar button{font-size:12px;padding:10px 6px;text-align:center}.heading{font-size:36px}.main-content{padding:2.5rem 1rem}}
 </style>
 </head>
 <body>
-<div class="sidebar">
-<button id="aboutBtn">About us</button>
-<button id="teamBtn">Meet the Team</button>
-<button id="issuesBtn">Issues</button>
-<button id="partnersBtn">Partners</button>
-<button id="moderatorsBtn">Moderators</button>
-<button id="adminsBtn">Administrators</button>
-<button id="logsBtn">Logs</button>
-</div>
+  <div class="sidebar">
+    <button id="aboutBtn">About us</button>
+    <button id="teamBtn">Meet the Team</button>
+    <button id="issuesBtn">Issues</button>
+    <button id="partnersBtn">Partners</button>
+    <button id="moderatorsBtn">Moderators</button>
+    <button id="adminsBtn">Administrators</button>
+    <button id="logsBtn">Logs</button>
+  </div>
 
-<main class="main-content" id="mainContent">
-<h1 class="heading" id="heading">Cozy Loft Cafe</h1>
-</main>
+  <main class="main-content" id="mainContent">
+    <h1 class="heading" id="heading">Cozy Loft Cafe</h1>
+  </main>
 
-<!-- Password Modal -->
-<div class="overlay" id="pwOverlay">
-<div class="modal">
-<h3>Password Required</h3>
-<p>Enter the password to access this panel.</p>
-<div class="input-row">
-<input id="pwInput" type="password" placeholder="Password" />
-<button id="pwSubmit">Unlock</button>
-</div>
-<div class="error" id="pwError"></div>
-<div style="display:flex; justify-content:flex-end; margin-top:12px;">
-<button id="pwCancel" style="background:#eee; color:#333; padding:8px 12px; border-radius:8px; border:none; cursor:pointer;">Cancel</button>
-</div>
-</div>
-</div>
+  <!-- Password Modal (reused for all three protected panels) -->
+  <div class="overlay" id="pwOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h3>Password Required</h3>
+      <p class="small-muted">Enter the password to access this panel.</p>
+      <div class="row input-row">
+        <input id="pwInput" type="password" placeholder="Password" autocomplete="off" />
+        <button id="pwSubmit">Unlock</button>
+      </div>
+      <div class="error" id="pwError"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:12px">
+        <button id="pwCancel" style="background:#eee;color:#333;padding:8px 12px;border-radius:8px;border:none;cursor:pointer">Cancel</button>
+      </div>
+    </div>
+  </div>
 
-<!-- Rename Modal -->
-<div class="overlay" id="renameOverlay">
-<div class="modal">
-<h3>Rename Moderator</h3>
-<p>Enter the new name:</p>
-<div class="input-row">
-<input id="renameInput" type="text" placeholder="New name..." />
-<button id="renameSubmit">Save</button>
-</div>
-<div style="display:flex; justify-content:flex-end; margin-top:12px;">
-<button id="renameCancel" style="background:#eee; color:#333; padding:8px 12px; border-radius:8px; border:none; cursor:pointer;">Cancel</button>
-</div>
-</div>
-</div>
+  <!-- Action Modal (Target, Reason, Duration) -->
+  <div class="overlay" id="actionOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h3 id="actionTitle">Action</h3>
+      <p class="small-muted" id="actionSubtitle">Enter details</p>
 
-<!-- Action Modal -->
-<div class="overlay" id="actionOverlay">
-<div class="modal">
-<h3 id="actionTitle">Action</h3>
-<p id="actionDesc">Enter details for this action:</p>
-<div class="input-row">
-<input id="actionReason" type="text" placeholder="Reason..." />
-<select id="actionDuration"></select>
-</div>
-<div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
-<button id="actionConfirm" style="background:#ff8c42;">Confirm</button>
-<button id="actionCancel" style="background:#eee; color:#333;">Cancel</button>
-</div>
-</div>
-</div>
+      <div class="row">
+        <label style="font-size:13px;color:#555">Target username</label>
+        <div class="input-row"><input id="actionTarget" placeholder="Player username or id" /></div>
+      </div>
+
+      <div class="row" id="renameRow" style="display:none">
+        <label style="font-size:13px;color:#555">New name</label>
+        <div class="input-row"><input id="renameTarget" placeholder="New display name" /></div>
+      </div>
+
+      <div class="row" id="reasonRow">
+        <label style="font-size:13px;color:#555">Reason</label>
+        <div class="input-row"><textarea id="actionReason" placeholder="Reason (why)"></textarea></div>
+      </div>
+
+      <div class="row" id="durationRow" style="display:none">
+        <label style="font-size:13px;color:#555">Duration</label>
+        <div class="input-row">
+          <select id="actionDuration"></select>
+        </div>
+        <div class="small-muted">Or choose <b>Custom</b> to type your own (e.g. "45m", "2h").</div>
+      </div>
+
+      <div class="error" id="actionError"></div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+        <button id="actionCancel" style="background:#eee;color:#333;padding:8px 12px;border-radius:8px;border:none;cursor:pointer">Cancel</button>
+        <button id="actionConfirm" style="background:#ff8c42;color:#fff;padding:8px 12px;border-radius:8px;border:none;cursor:pointer">Confirm</button>
+      </div>
+    </div>
+  </div>
 
 <script>
-const mainContent=document.getElementById('mainContent');
-const heading=document.getElementById('heading');
-const aboutBtn=document.getElementById('aboutBtn');
-const moderatorsBtn=document.getElementById('moderatorsBtn');
-const adminsBtn=document.getElementById('adminsBtn');
-const logsBtn=document.getElementById('logsBtn');
+/* Core elements */
+const mainContent = document.getElementById('mainContent');
+const heading = document.getElementById('heading');
+const aboutBtn = document.getElementById('aboutBtn');
+const moderatorsBtn = document.getElementById('moderatorsBtn');
+const adminsBtn = document.getElementById('adminsBtn');
+const logsBtn = document.getElementById('logsBtn');
 
-const pwOverlay=document.getElementById('pwOverlay');
-const pwInput=document.getElementById('pwInput');
-const pwSubmit=document.getElementById('pwSubmit');
-const pwCancel=document.getElementById('pwCancel');
-const pwError=document.getElementById('pwError');
+/* Password modal elements */
+const pwOverlay = document.getElementById('pwOverlay');
+const pwInput = document.getElementById('pwInput');
+const pwSubmit = document.getElementById('pwSubmit');
+const pwCancel = document.getElementById('pwCancel');
+const pwError = document.getElementById('pwError');
 
-const renameOverlay=document.getElementById('renameOverlay');
-const renameInput=document.getElementById('renameInput');
-const renameSubmit=document.getElementById('renameSubmit');
-const renameCancel=document.getElementById('renameCancel');
-let currentRenameBox=null;
+/* Action modal elements */
+const actionOverlay = document.getElementById('actionOverlay');
+const actionTitle = document.getElementById('actionTitle');
+const actionSubtitle = document.getElementById('actionSubtitle');
+const actionTarget = document.getElementById('actionTarget');
+const renameRow = document.getElementById('renameRow');
+const renameTarget = document.getElementById('renameTarget');
+const actionReason = document.getElementById('actionReason');
+const actionDuration = document.getElementById('actionDuration');
+const durationRow = document.getElementById('durationRow');
+const actionError = document.getElementById('actionError');
+const actionConfirm = document.getElementById('actionConfirm');
+const actionCancel = document.getElementById('actionCancel');
 
-const actionOverlay=document.getElementById('actionOverlay');
-const actionTitle=document.getElementById('actionTitle');
-const actionDesc=document.getElementById('actionDesc');
-const actionReason=document.getElementById('actionReason');
-const actionDuration=document.getElementById('actionDuration');
-const actionConfirm=document.getElementById('actionConfirm');
-const actionCancel=document.getElementById('actionCancel');
-let currentAction=null;
-let customDurationInput=null;
+let protectedCallback = null; // callback after correct password
+const PASSWORD = '123456';
 
-let logs=[]; // Store all actions
+/* Logs storage */
+let globalLogs = []; // all actions (for Admin Logs)
+let moderatorLogEntries = []; // entries shown under the moderator panel (shared)
 
-function fadeOut(el, cb){ el.style.opacity=0; setTimeout(()=>cb&&cb(),450); }
-function fadeIn(el){ el.style.opacity=0; requestAnimationFrame(()=>{ el.style.transition='opacity .45s'; el.style.opacity=1; }); }
+/* helper fades */
+function fadeOut(el, cb){ el.style.opacity = 0; setTimeout(()=>cb&&cb(),450) }
+function fadeIn(el){ el.style.opacity = 0; requestAnimationFrame(()=>{ el.style.transition = 'opacity .45s'; el.style.opacity = 1 }) }
 
-// Password modal helper
-function openPassword(cb){ pwInput.value=''; pwError.textContent=''; pwError.classList.remove('show'); pwOverlay.classList.add('show'); pwInput.focus();
-pwSubmit.onclick=()=>{ if(pwInput.value==='123456'){ pwOverlay.classList.remove('show'); cb(); } else { pwError.textContent='Incorrect password'; pwError.classList.add('show'); } };
+/* ABOUT US view */
+aboutBtn.onclick = () => {
+  fadeOut(mainContent, () => {
+    mainContent.innerHTML = '';
+    const h = document.createElement('h1'); h.className = 'heading'; h.textContent = 'About Cozy Loft Cafe Roblox';
+    mainContent.appendChild(h);
+
+    const container = document.createElement('div'); container.className = 'about-container';
+    const paragraphs = [
+      "Cozy Loft Cafe in Roblox is a virtual space where players can gather, relax, and enjoy a warm, inviting atmosphere. It features modern loft aesthetics with comfy seating and stylish décor.",
+      "The cafe offers interactive elements, such as ordering drinks and snacks, making it a fully immersive experience for Roblox players.",
+      "Players can customize their own tables and spaces, allowing for personal touches that make each visit unique and memorable.",
+      "Regular events are held at Cozy Loft Cafe, including music nights, community hangouts, and special themed activities that bring players together.",
+      "The goal of Cozy Loft Cafe is to create a friendly, welcoming environment where players can socialize, explore, and enjoy the creativity of the Roblox platform."
+    ];
+    paragraphs.forEach(p=>{
+      const box = document.createElement('div'); box.className = 'card'; box.textContent = p; container.appendChild(box);
+    });
+
+    const back = document.createElement('button'); back.className = 'back-btn'; back.textContent = 'Back';
+    back.onclick = ()=>{ fadeOut(mainContent, ()=>{ mainContent.innerHTML=''; mainContent.appendChild(heading); fadeIn(mainContent); }) };
+    container.appendChild(back);
+    mainContent.appendChild(container);
+    requestAnimationFrame(()=>container.classList.add('show'));
+    fadeIn(mainContent);
+  })
 }
 
-// ABOUT US
-aboutBtn.onclick=()=>{
-fadeOut(mainContent,()=>{
-mainContent.innerHTML='';
-const newHeading=document.createElement('h1'); newHeading.className='heading'; newHeading.textContent='About Cozy Loft Cafe Roblox';
-mainContent.appendChild(newHeading);
-const container=document.createElement('div'); container.className='about-container';
-const paragraphs=[
-"Cozy Loft Cafe in Roblox is a virtual space where players can gather, relax, and enjoy a warm, inviting atmosphere. It features modern loft aesthetics with comfy seating and stylish décor.",
-"The cafe offers interactive elements, such as ordering drinks and snacks, making it a fully immersive experience for Roblox players.",
-"Players can customize their own tables and spaces, allowing for personal touches that make each visit unique and memorable.",
-"Regular events are held at Cozy Loft Cafe, including music nights, community hangouts, and special themed activities that bring players together.",
-"The goal of Cozy Loft Cafe is to create a friendly, welcoming environment where players can socialize, explore, and enjoy the creativity of the Roblox platform."
-];
-paragraphs.forEach(t=>{ const box=document.createElement('div'); box.className='about-box'; box.textContent=t; container.appendChild(box); });
-const backBtn=document.createElement('button'); backBtn.className='back-btn'; backBtn.textContent='Back';
-backBtn.onclick=()=>{ fadeOut(mainContent,()=>{ mainContent.innerHTML=''; mainContent.appendChild(heading); fadeIn(mainContent); }); };
-container.appendChild(backBtn);
-mainContent.appendChild(container); requestAnimationFrame(()=>container.classList.add('show')); fadeIn(mainContent);
-});
-
-// RENAME MODAL
-renameCancel.onclick=()=>renameOverlay.classList.remove('show');
-renameSubmit.onclick=()=>{ const newName=renameInput.value.trim(); if(newName&&currentRenameBox){ currentRenameBox.querySelector('strong').textContent=newName; logs.push({action:'Rename', target:newName, moderator:'System', reason:'', duration:'', time:new Date().toLocaleString()}); updateLogsUI(); renameOverlay.classList.remove('show'); } };
-
-// ACTION MODAL
-actionCancel.onclick=()=>{ actionOverlay.classList.remove('show'); if(customDurationInput){ customDurationInput.remove(); customDurationInput=null; } };
-actionConfirm.onclick=()=>{
-const reason=actionReason.value.trim();
-let duration=actionDuration.value==='custom'?customDurationInput.value.trim():actionDuration.value;
-if(reason===''){ alert('Please enter a reason'); return; }
-logs.push({action:currentAction.action,target:currentAction.name,moderator:'System',reason,duration:duration||'',time:new Date().toLocaleString()});
-updateLogsUI();
-actionOverlay.classList.remove('show'); if(customDurationInput){ customDurationInput.remove(); customDurationInput=null; }
-alert(`${currentAction.name} ${currentAction.action}d${duration?` for ${duration}`:''} (Reason: ${reason})`);
+/* PASSWORD overlay helper (used for Moderators, Admins, Logs) */
+function requestPassword(callback){
+  protectedCallback = callback;
+  pwInput.value = '';
+  pwError.textContent = '';
+  pwError.classList.remove('show');
+  pwOverlay.classList.add('show');
+  pwInput.focus();
+}
+pwCancel.onclick = ()=> pwOverlay.classList.remove('show');
+pwSubmit.onclick = ()=> {
+  if(pwInput.value === PASSWORD){
+    pwOverlay.classList.remove('show');
+    if(typeof protectedCallback === 'function') protectedCallback();
+    protectedCallback = null;
+  } else {
+    pwError.textContent = 'Incorrect password';
+    pwError.classList.add('show');
+  }
 };
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ if(pwOverlay.classList.contains('show')) pwOverlay.classList.remove('show'); if(actionOverlay.classList.contains('show')) closeActionModal(); } });
 
-// MODERATORS PANEL
-moderatorsBtn.onclick=()=>openPassword(showModeratorsUI);
+/* MODERATORS panel — password-protected entry */
+moderatorsBtn.onclick = ()=> requestPassword(showModeratorsPanel);
 
-function showModeratorsUI(){
-fadeOut(mainContent,()=>{
-mainContent.innerHTML='';
-const newHeading=document.createElement('h1'); newHeading.className='heading'; newHeading.textContent='Moderators Panel';
-mainContent.appendChild(newHeading);
-const container=document.createElement('div'); container.className='moderators-container';
-const mods=[
-{ name:'Avery', role:'Lead Moderator', note:'Focus on community events and behavior.' },
-{ name:'Kai', role:'Moderator', note:'Handles in-game infractions and reports.' },
-{ name:'Rhea', role:'Moderator', note:'Moderator & event coordinator.' }
-];
-mods.forEach(m=>{
-const box=document.createElement('div'); box.className='about-box';
-box.innerHTML=`<strong>${m.name}</strong> — ${m.role}<div style="margin-top:8px;color:#555">${m.note}</div>`;
-const actions=document.createElement('div'); actions.className='mod-actions';
-['Warn','Mute','Timeout','Rename'].forEach(a=>{
-const btn=document.createElement('button'); btn.textContent=a; btn.className=a.toLowerCase();
-if(a==='Rename'){ btn.onclick=()=>{ currentRenameBox=box; renameInput.value=box.querySelector('strong').textContent; renameOverlay.classList.add('show'); renameInput.focus(); }; }
-else { btn.onclick=()=>{ currentAction={action:a,name:m.name}; showActionModal(a); }; }
-actions.appendChild(btn);
-});
-box.appendChild(actions); container.appendChild(box);
-});
-const backBtn=document.createElement('button'); backBtn.className='back-btn'; backBtn.textContent='Back';
-backBtn.onclick=()=>{ fadeOut(mainContent,()=>{ mainContent.innerHTML=''; mainContent.appendChild(heading); fadeIn(mainContent); }); };
-container.appendChild(backBtn);
-mainContent.appendChild(container); requestAnimationFrame(()=>container.classList.add('show')); fadeIn(mainContent);
+/* Show moderators UI: only buttons and shared moderator log */
+function showModeratorsPanel(){
+  fadeOut(mainContent,()=>{
+    mainContent.innerHTML = '';
+    const h = document.createElement('h1'); h.className='heading'; h.textContent='Moderators Panel';
+    mainContent.appendChild(h);
+
+    const container = document.createElement('div'); container.className='moderators-container';
+
+    // Action buttons area card
+    const actionCard = document.createElement('div'); actionCard.className='card';
+    const title = document.createElement('div'); title.style.fontWeight='700'; title.textContent = 'Moderator Actions';
+    actionCard.appendChild(title);
+
+    const actions = document.createElement('div'); actions.className='mod-actions';
+    const warnBtn = document.createElement('button'); warnBtn.className='warn'; warnBtn.textContent='Warn';
+    const muteBtn = document.createElement('button'); muteBtn.className='mute'; muteBtn.textContent='Mute';
+    const timeoutBtn = document.createElement('button'); timeoutBtn.className='timeout'; timeoutBtn.textContent='Timeout';
+    const renameBtn = document.createElement('button'); renameBtn.className='rename'; renameBtn.textContent='Rename';
+
+    actions.appendChild(warnBtn); actions.appendChild(muteBtn); actions.appendChild(timeoutBtn); actions.appendChild(renameBtn);
+    actionCard.appendChild(actions);
+
+    // Shared moderator log area (live-updating)
+    const logTitle = document.createElement('div'); logTitle.style.marginTop='12px'; logTitle.style.fontWeight='600'; logTitle.textContent='Moderator Action Log (this panel)';
+    actionCard.appendChild(logTitle);
+
+    const modLog = document.createElement('div'); modLog.className='mod-log'; modLog.id='modLog';
+    if(moderatorLogEntries.length === 0){
+      const empty = document.createElement('div'); empty.className='small-muted'; empty.textContent='No actions yet.'; modLog.appendChild(empty);
+    } else {
+      moderatorLogEntries.forEach(e => { const d = document.createElement('div'); d.className='log-entry'; d.textContent = formatLogEntry(e); modLog.appendChild(d) })
+    }
+    actionCard.appendChild(modLog);
+
+    // Back button
+    const back = document.createElement('button'); back.className='back-btn'; back.textContent='Back';
+    back.onclick = ()=>{ fadeOut(mainContent, ()=>{ mainContent.innerHTML=''; mainContent.appendChild(heading); fadeIn(mainContent); }) };
+
+    container.appendChild(actionCard);
+    container.appendChild(back);
+    mainContent.appendChild(container);
+    requestAnimationFrame(()=>container.classList.add('show'));
+    fadeIn(mainContent);
+
+    // Wire button handlers (open action modal accordingly)
+    warnBtn.onclick = ()=> openActionModal('Warn');
+    muteBtn.onclick = ()=> openActionModal('Mute');
+    timeoutBtn.onclick = ()=> openActionModal('Timeout');
+    renameBtn.onclick = ()=> openActionModal('Rename');
+  })
 }
 
-// ACTION MODAL
-function showActionModal(action){
-actionOverlay.classList.add('show');
-actionTitle.textContent=`${action} Moderator`;
-actionDesc.textContent=`Enter details for ${action.toLowerCase()}:`;
-actionReason.value=''; actionDuration.innerHTML='';
-let options=[];
-if(action==='Warn'){ options=['No duration']; }
-if(action==='Mute'){ options=['5m','10m','30m','1h','24h','Custom']; }
-if(action==='Timeout'){ options=['30m','1h','6h','12h','24h','Custom']; }
-options.forEach(o=>{ const opt=document.createElement('option'); opt.value=o.toLowerCase()==='custom'?'custom':o; opt.textContent=o; actionDuration.appendChild(opt); });
-actionDuration.onchange=()=>{ if(actionDuration.value==='custom'){ const input=document.createElement('input'); input.placeholder='Enter custom time'; input.id='customDurationInput'; input.style.flex='1'; input.style.padding='10px'; actionDuration.parentNode.appendChild(input); customDurationInput=input; } else { if(customDurationInput){ customDurationInput.remove(); customDurationInput=null; } } };
+/* ACTION modal helpers */
+/* Opens the modal for a given action type.
+   For Warn: target + reason
+   For Mute: target + reason + duration (5m,10m,30m,1h,24h + Custom)
+   For Timeout: target + reason + duration (30m,1h,6h,12h,24h + Custom)
+   For Rename: target + new name (uses renameTarget field)
+*/
+function openActionModal(actionType){
+  currentAction = { action: actionType }; // temp holder
+  actionTitle.textContent = `${actionType}`;
+  actionSubtitle.textContent = `Fill the fields for ${actionType.toLowerCase()}.`;
+  actionTarget.value = '';
+  actionReason.value = '';
+  actionError.textContent = '';
+  actionError.classList.remove('show');
+  renameRow.style.display = 'none';
+  durationRow.style.display = 'none';
+  actionDuration.innerHTML = '';
+
+  if(actionType === 'Warn'){
+    reasonRowShow(true); durationRow.style.display='none';
+    // Warn: no durations; only reason.
+  } else if(actionType === 'Mute'){
+    reasonRowShow(true); durationRow.style.display='block';
+    populateDurationOptions(['5m','10m','30m','1h','24h','Custom']);
+  } else if(actionType === 'Timeout'){
+    reasonRowShow(true); durationRow.style.display='block';
+    populateDurationOptions(['30m','1h','6h','12h','24h','Custom']);
+  } else if(actionType === 'Rename'){
+    reasonRowShow(false); durationRow.style.display='none';
+    renameRow.style.display = 'block';
+    renameTarget.value = '';
+  }
+
+  // show modal
+  actionOverlay.classList.add('show');
+  actionTarget.focus();
 }
 
-// LOGS PANEL
-logsBtn.onclick=()=>openPassword(showLogsUI);
-adminsBtn.onclick=()=>openPassword(showAdministratorsUI); // placeholder for admins
-
-function showLogsUI(){
-fadeOut(mainContent,()=>{
-mainContent.innerHTML='';
-const newHeading=document.createElement('h1'); newHeading.className='heading'; newHeading.textContent='Administrator Logs';
-mainContent.appendChild(newHeading);
-const container=document.createElement('div'); container.className='logs-container';
-mainContent.appendChild(container);
-updateLogsUI();
-});
+/* helper to show/hide reason row */
+function reasonRowShow(show){
+  document.getElementById('reasonRow').style.display = show ? 'block' : 'none';
 }
 
-function showAdministratorsUI(){ fadeOut(mainContent,()=>{ mainContent.innerHTML=''; const newHeading=document.createElement('h1'); newHeading.className='heading'; newHeading.textContent='Administrators Panel'; mainContent.appendChild(newHeading); const backBtn=document.createElement('button'); backBtn.className='back-btn'; backBtn.textContent='Back'; backBtn.onclick=()=>{ fadeOut(mainContent,()=>{ mainContent.innerHTML=''; mainContent.appendChild(heading); fadeIn(mainContent); }); }; mainContent.appendChild(backBtn); fadeIn(mainContent); }); }
-
-// LIVE LOGS UPDATE
-function updateLogsUI(){
-const container=document.querySelector('.logs-container');
-if(!container) return;
-container.innerHTML='';
-if(logs.length===0){ const box=document.createElement('div'); box.className='log-box'; box.textContent='No logs yet.'; container.appendChild(box); }
-else{ logs.slice().reverse().forEach(l=>{ const box=document.createElement('div'); box.className='log-box'; box.textContent=`[${l.time}] ${l.moderator} performed ${l.action} on ${l.target}${l.duration?` for ${l.duration}`:''}${l.reason?` (Reason: ${l.reason})`:''}`; container.appendChild(box); }); }
-const backBtn=document.createElement('button'); backBtn.className='back-btn'; backBtn.textContent='Back';
-backBtn.onclick=()=>{ fadeOut(mainContent,()=>{ mainContent.innerHTML=''; mainContent.appendChild(heading); fadeIn(mainContent); }); };
-container.appendChild(backBtn);
+/* populate duration select with values and attach custom handling */
+function populateDurationOptions(list){
+  actionDuration.innerHTML = '';
+  list.forEach(item=>{
+    const opt = document.createElement('option');
+    opt.value = item.toLowerCase()==='custom'?'custom':item;
+    opt.textContent = item;
+    actionDuration.appendChild(opt);
+  });
+  // remove existing custom input if any
+  if(window._customDurInput){ window._customDurInput.remove(); window._customDurInput = null; }
+  actionDuration.onchange = ()=>{
+    if(actionDuration.value === 'custom'){
+      // append a small custom input below select
+      if(!window._customDurInput){
+        const input = document.createElement('input');
+        input.placeholder = 'Enter custom duration (e.g. 45m, 2h)';
+        input.id = 'customDur';
+        input.style.marginTop = '8px';
+        input.style.padding = '10px';
+        input.style.borderRadius = '8px';
+        input.style.border = '1px solid #e6e6e6';
+        input.style.width = '100%';
+        actionDuration.parentNode.appendChild(input);
+        window._customDurInput = input;
+        input.focus();
+      }
+    } else {
+      if(window._customDurInput){ window._customDurInput.remove(); window._customDurInput = null; }
+    }
+  }
 }
+
+/* Close action modal and cleanup */
+function closeActionModal(){
+  actionOverlay.classList.remove('show');
+  if(window._customDurInput){ window._customDurInput.remove(); window._customDurInput = null; }
+}
+actionCancel.onclick = closeActionModal;
+
+/* Confirm action */
+actionConfirm.onclick = ()=>{
+  const actionType = currentAction.action;
+  const target = actionTarget.value.trim();
+  if(!target){ actionError.textContent = 'Please enter a target username.'; actionError.classList.add('show'); return; }
+  let reason = actionReason.value.trim();
+  let duration = '';
+  if(actionType === 'Rename'){
+    const newName = renameTarget.value.trim();
+    if(!newName){ actionError.textContent = 'Please enter the new name.'; actionError.classList.add('show'); return; }
+    // Log rename: target => newName
+    const entry = {
+      action: 'Rename',
+      target: target,
+      extra: `to "${newName}"`,
+      reason: '',
+      duration: '',
+      time: new Date().toLocaleString()
+    };
+    pushLog(entry);
+    closeActionModal();
+    alert(`Renamed ${target} → ${newName}`);
+    return;
+  }
+
+  // for Warn/Mute/Timeout
+  if(actionType === 'Warn'){
+    if(!reason){ actionError.textContent = 'Please enter a reason.'; actionError.classList.add('show'); return; }
+  } else {
+    // Mute/Timeout: duration required (or custom)
+    const sel = actionDuration.value;
+    if(!sel){ actionError.textContent = 'Please select a duration.'; actionError.classList.add('show'); return; }
+    if(sel === 'custom'){
+      if(window._customDurInput && window._customDurInput.value.trim()){
+        duration = window._customDurInput.value.trim();
+      } else {
+        actionError.textContent = 'Please enter a custom duration.'; actionError.classList.add('show'); return;
+      }
+    } else {
+      duration = sel;
+    }
+    if(!reason){ actionError.textContent = 'Please enter a reason.'; actionError.classList.add('show'); return; }
+  }
+
+  // push appropriate entry
+  const entry = {
+    action: actionType,
+    target: target,
+    extra: '',
+    reason: reason,
+    duration: duration,
+    time: new Date().toLocaleString()
+  };
+  pushLog(entry);
+  closeActionModal();
+  alert(`${target} ${actionType} applied${duration?` for ${duration}`:''} — Reason: ${reason}`);
+}
+
+/* push logs to both moderator shared log and global logs and update UI */
+function pushLog(entry){
+  // create display string for shared moderator log
+  const short = { ...entry }; // copy
+  moderatorLogEntries.push(short);
+  globalLogs.push({ ...entry, moderator: 'Local' }); // 'moderator' placeholder - you can change to real names later
+
+  // update moderator UI if present
+  const modLog = document.getElementById('modLog');
+  if(modLog){
+    // if it had the empty message, remove it
+    if(modLog.children.length === 1 && modLog.children[0].classList.contains('small-muted')) modLog.innerHTML = '';
+    const el = document.createElement('div'); el.className='log-entry'; el.textContent = formatLogEntry(entry);
+    modLog.appendChild(el);
+    modLog.scrollTop = modLog.scrollHeight;
+  }
+  // update global logs panel if open
+  updateGlobalLogsPanelLive();
+}
+
+/* format a log object into readable string */
+function formatLogEntry(e){
+  if(e.action === 'Rename') return `[${e.time}] Rename ${e.target} ${e.extra||''}`;
+  let s = `[${e.time}] ${e.action} ${e.target}`;
+  if(e.duration) s += ` for ${e.duration}`;
+  if(e.reason) s += ` — ${e.reason}`;
+  return s;
+}
+
+/* ADMIN/LOGS panels: password protected */
+logsBtn.onclick = ()=> requestPassword(showLogsPanel);
+adminsBtn.onclick = ()=> requestPassword(showAdminsPanel);
+
+/* Show Logs Panel */
+function showLogsPanel(){
+  fadeOut(mainContent, ()=> {
+    mainContent.innerHTML = '';
+    const h = document.createElement('h1'); h.className='heading'; h.textContent='Administrator Logs';
+    mainContent.appendChild(h);
+
+    const container = document.createElement('div'); container.className='logs-container';
+    const box = document.createElement('div'); box.className='card'; box.style.padding='12px';
+    const logsHolder = document.createElement('div'); logsHolder.id = 'globalLogsHolder'; logsHolder.style.maxHeight='420px'; logsHolder.style.overflow='auto';
+    box.appendChild(logsHolder);
+
+    container.appendChild(box);
+    const back = document.createElement('button'); back.className='back-btn'; back.textContent='Back';
+    back.onclick = ()=>{ fadeOut(mainContent, ()=>{ mainContent.innerHTML=''; mainContent.appendChild(heading); fadeIn(mainContent); }) };
+    container.appendChild(back);
+
+    mainContent.appendChild(container);
+    requestAnimationFrame(()=>container.classList.add('show'));
+    fadeIn(mainContent);
+    // populate logs
+    updateGlobalLogsUI();
+  })
+}
+
+/* Show Administrators Panel (simple placeholder with Back) */
+function showAdminsPanel(){
+  fadeOut(mainContent, ()=>{
+    mainContent.innerHTML = '';
+    const h = document.createElement('h1'); h.className='heading'; h.textContent='Administrators Panel';
+    mainContent.appendChild(h);
+    const container = document.createElement('div'); container.className='logs-container';
+    const card = document.createElement('div'); card.className='card'; card.textContent = 'Administrators UI — (placeholder). Use Logs to view actions.';
+    container.appendChild(card);
+    const back = document.createElement('button'); back.className='back-btn'; back.textContent='Back';
+    back.onclick = ()=>{ fadeOut(mainContent, ()=>{ mainContent.innerHTML=''; mainContent.appendChild(heading); fadeIn(mainContent); }) };
+    container.appendChild(back);
+    mainContent.appendChild(container);
+    requestAnimationFrame(()=>container.classList.add('show'));
+    fadeIn(mainContent);
+  })
+}
+
+/* update global logs UI (when opening Logs panel) */
+function updateGlobalLogsUI(){
+  const holder = document.getElementById('globalLogsHolder');
+  if(!holder) return;
+  holder.innerHTML = '';
+  if(globalLogs.length === 0){
+    const empty = document.createElement('div'); empty.className='small-muted'; empty.textContent='No logs yet.';
+    holder.appendChild(empty);
+  } else {
+    // show newest first
+    globalLogs.slice().reverse().forEach(l=>{
+      const d = document.createElement('div'); d.className='log-entry'; d.textContent = formatGlobalLog(l); holder.appendChild(d);
+    })
+  }
+}
+
+/* format global log */
+function formatGlobalLog(l){
+  if(l.action === 'Rename') return `[${l.time}] Rename ${l.target} ${l.extra||''}`;
+  let s = `[${l.time}] ${l.action} ${l.target}`;
+  if(l.duration) s += ` for ${l.duration}`;
+  if(l.reason) s += ` — ${l.reason}`;
+  return s;
+}
+
+/* When logs panel is open, we want live updates. This function will update it if it's visible. */
+function updateGlobalLogsPanelLive(){
+  const holder = document.getElementById('globalLogsHolder');
+  if(!holder) return; // not open
+  // append latest entry
+  const l = globalLogs[globalLogs.length - 1];
+  if(!l) return;
+  const d = document.createElement('div'); d.className='log-entry'; d.textContent = formatGlobalLog(l);
+  holder.insertBefore(d, holder.firstChild);
+}
+
+/* ensure ESC closes action modal as well */
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape'){ if(actionOverlay.classList.contains('show')) closeActionModal(); } });
+
+/* small initial fade-in */
+document.addEventListener('DOMContentLoaded', ()=>{ mainContent.style.opacity = 1; });
+
+/* End of script */
 </script>
 </body>
 </html>
